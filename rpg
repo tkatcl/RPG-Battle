@@ -182,7 +182,7 @@ def set_difficulty():
     if difficulty == 'quit':
       app.quit()
 
-    if difficulty not in 'emhl' or difficulty == '':
+    if difficulty not in ['e','m','h','l'] or difficulty == '':
       raise ValueError
 
   except ValueError:
