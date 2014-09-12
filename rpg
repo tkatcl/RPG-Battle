@@ -6,13 +6,15 @@ Written by Bruce Fuda for Intermediate Programming
 Python RPG Assignment 2014
 """
 
+#import required python module and files
 import time
 import gui
 import character
 import battle
 
-app = gui.simpleapp_tk(None)
-app.title('RPG Battle')
+app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
+
+app.title('RPG Battle') #name displayed on title bar
 
 app.write('''
  _    _      _                             _         
@@ -35,29 +37,25 @@ app.write("")
 
 def set_mode():
   """ Select the game mode """
-  # This is an error checking version of reading user input
-  # This will be explained in class - pay attention!!
-  # Understanding try/except cases is important for
-  # verifying user input
   try:
     app.write("Please select a side:")
     app.write("1. Good")
     app.write("2. Evil")
     app.write("")
-    app.wait_variable(app.inputVariable)
-    mode = app.inputVariable.get()
+    app.wait_variable(app.inputVariable) #wait till user enters input
+    mode = app.inputVariable.get() #variable of input
     
     if mode == 'quit':
       app.quit()
     
     mode = int(mode)
-    if mode not in range(1,3):
+    if mode not in range(1,3): # check for 1 or 2
       raise ValueError
   
-  except ValueError:
+  except ValueError: #exception handling for value error
     app.write("You must enter a valid choice")
     app.write("")
-    mode = set_mode()
+    mode = set_mode() #recall function
   
   return mode
 
@@ -75,22 +73,22 @@ def set_race(mode):
       app.write("3. Uruk")
       app.write("4. Wizard")
       app.write("")
-      app.wait_variable(app.inputVariable)
-      race = app.inputVariable.get()
+      app.wait_variable(app.inputVariable)#enter input
+      race = app.inputVariable.get()#input var
       
       if race == 'quit':
         app.quit()
       
       race = int(race)
-      if race not in range(1,5):
+      if race not in range(1,5):#check for 1 to 4
         raise ValueError
     
-    except ValueError:
+    except ValueError: #exception handling
       app.write("You must enter a valid choice")
       app.write("")
-      race = set_race(mode)
+      race = set_race(mode)#recall function
 
-  else: # Good Mode
+  else: # Good Mode (if mode == 1)
     app.write("Playing as the Free Peoples of Middle Earth.")
     app.write("")
 
@@ -103,30 +101,31 @@ def set_race(mode):
       app.write("4. Hobbit")
       app.write("5. Wizard")
       app.write("")
-      app.wait_variable(app.inputVariable)
-      race = app.inputVariable.get()
+      app.wait_variable(app.inputVariable)#enter input
+      race = app.inputVariable.get()#input var
       
       if race == 'quit':
         app.quit()
+        
       race = int(race)
       
       if race not in range(1,6):
         raise ValueError
     
-    except ValueError:
+    except ValueError: #exception handling
       app.write("You must enter a valid choice")
       app.write("")
-      race = set_race(mode)
+      race = set_race(mode)#recall function
   
-  return race
+  return race #return number
 
 def set_name():
   """ Set the player's name """
   try:
     app.write("Please enter your Character Name:")
     app.write("")
-    app.wait_variable(app.inputVariable)
-    char_name = app.inputVariable.get()
+    app.wait_variable(app.inputVariable)#enter input
+    char_name = app.inputVariable.get()#input var
 
     if char_name == 'quit':
       app.quit()
@@ -134,38 +133,38 @@ def set_name():
     if char_name == '':
       raise ValueError
 
-  except ValueError:
+  except ValueError:#exception handling
     app.write("")
     app.write("Your name cannot be blank")
-    char_name = set_name()
+    char_name = set_name()#recall function
 
-  return char_name
+  return char_name #return string name
 
 def create_player(mode, race, char_name):
   """ Create the player's character """
   # Evil
   if mode == 2:
     if race == 1:
-      player = character.Goblin(char_name, app)
+      player = character.Goblin(char_name, app)#instanciate goblin object from character fill as player
     elif race == 2:
-      player = character.Orc(char_name, app)
+      player = character.Orc(char_name, app)#instanciate Orc object from character fill as player
     elif race == 3:
-      player = character.Uruk(char_name, app)
+      player = character.Uruk(char_name, app)#instanciate Uruk object from character fill as player
     else:
-      player = character.Wizard(char_name, app)
+      player = character.Wizard(char_name, app)#instanciate Wizard object from character fill as player
   # Good
   else:
     if race == 1:
-      player = character.Elf(char_name, app)
+      player = character.Elf(char_name, app)#instanciate Elf object from character fill as player
     elif race == 2:
-      player = character.Dwarf(char_name, app)
+      player = character.Dwarf(char_name, app)#instanciate Dwarf object from character fill as player
     elif race == 3:
-      player = character.Human(char_name, app)
+      player = character.Human(char_name, app)#instanciate Human object from character fill as player
     elif race == 4:
-      player = character.Hobbit(char_name, app)
+      player = character.Hobbit(char_name, app)#instanciate Hobbit object from character fill as player
     else:
-      player = character.Wizard(char_name, app)
-  return player
+      player = character.Wizard(char_name, app)#instanciate Wizard object from character fill as player
+  return player #object player
 
 def set_difficulty():
   """ Set the difficulty of the game """
@@ -176,8 +175,8 @@ def set_difficulty():
     app.write("h - Hard")
     app.write("l - Legendary")
     app.write("")
-    app.wait_variable(app.inputVariable)
-    difficulty = app.inputVariable.get()
+    app.wait_variable(app.inputVariable)#wait for input 
+    difficulty = app.inputVariable.get()#input var
 
     if difficulty == 'quit':
       app.quit()
@@ -185,10 +184,10 @@ def set_difficulty():
     if difficulty not in ['e','m','h','l'] or difficulty == '':
       raise ValueError
 
-  except ValueError:
+  except ValueError: #exception handling
     app.write("You must enter a valid choice")
     app.write("")
-    difficulty = set_difficulty()
+    difficulty = set_difficulty()#recall function
 
   return difficulty
 
@@ -196,48 +195,49 @@ def create_enemies(mode, difficulty):
   """ Create the enemies """
   if mode == 2: # Evil Mode - good enemies
     if difficulty == 'm':
-      enemies = [character.Hobbit("Peregrin", app), character.Hobbit("Meriadoc", app), character.Human("Eowyn", app)]
+      enemies = [character.Hobbit("Peregrin", app), character.Hobbit("Meriadoc", app), character.Human("Eowyn", app)] #hobbit,hobbit,human (medium)
     elif difficulty == 'h':
-      enemies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]
+      enemies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]#dwarf,elf,human (hard)
     elif difficulty == 'l':
-      enemies = [character.Human("Faramir", app), character.Human("Aragorn", app), character.Wizard("Gandalf", app)]
+      enemies = [character.Human("Faramir", app), character.Human("Aragorn", app), character.Wizard("Gandalf", app)]#human,human,wizard (legendary)
     else:
-      enemies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]
+      enemies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]#hobbit,hobbit (easy)
 
   else: # Good Mode - evil enemies
     if difficulty == 'm':
-      enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app), character.Orc("Sharku", app)]
+      enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app), character.Orc("Sharku", app)] #goblin,goblin,orc (medium)
     elif difficulty == 'h':
-      enemies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)]
+      enemies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
     elif difficulty == 'l':
-      enemies = [character.Orc("Grishnakh", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)]
+      enemies = [character.Orc("Grishnakh", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #orc,uruk,wizard (legendary)
     else:
-      enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)]
+      enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)
 
-  return enemies
+  return enemies #list of enemy objects
 
 def quit_game():
   """ Quits the game """
   try:
     app.write("Play Again? (y/n)")
     app.write("")
-    app.wait_variable(app.inputVariable)
-    quit_choice = app.inputVariable.get()
+    app.wait_variable(app.inputVariable)#wait for input
+    quit_choice = app.inputVariable.get()#quit choice
 
     if quit_choice == 'quit':
       app.quit()
 
-    if quit_choice not in 'yn' or quit_choice == '':
+    if quit_choice not in ['y','n'] or quit_choice == '':
       raise ValueError
 
   except ValueError:
     app.write("You must enter a valid choice")
     app.write("")
-    quit_choice = quit_game()
+    quit_choice = quit_game()#recall function
 
   return quit_choice
 
 def print_results():
+  """displays statistics"""
   app.write("Game Over!")
   app.write("No. Battles: {0}".format(str(battles)))
   app.write("No. Wins: {0}".format(wins))
@@ -250,19 +250,19 @@ battles = 0
 wins = 0
 kills = 0
 
-mode = set_mode()
-race = set_race(mode)
-char_name = set_name()
-player = create_player(mode, race, char_name)
-app.write(player)
+mode = set_mode() #return good or evil
+race = set_race(mode) #set race based on good or evil
+char_name = set_name() #player name
+player = create_player(mode, race, char_name)#instanciate player object
+app.write(player)#prints you are name the class
 app.write("")
-difficulty = set_difficulty()
-enemies = create_enemies(mode, difficulty)
+difficulty = set_difficulty()#returns str of difficulty
+enemies = create_enemies(mode, difficulty)#returns list of enemy objects 
 
 while True:
 
-  encounter = battle.Battle(player, enemies, app)
-  battle_wins, battle_kills = encounter.play()
+  encounter = battle.Battle(player, enemies, app) #instanciate battle from battle file
+  battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
 
   battles += 1
   wins += battle_wins
@@ -282,3 +282,4 @@ while True:
     player.reset()
     for enemy in enemies:
       enemy.reset()
+
