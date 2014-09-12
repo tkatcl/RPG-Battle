@@ -1,4 +1,4 @@
-Enter file contents here#!/usr/local/bin/python3
+#!/usr/local/bin/python3
 """
 Battle.py - The battle class manages the events of the battle
 
@@ -36,7 +36,7 @@ class Battle:
       
       self.app.write("Turn "+str(self.turn))
       self.app.write("")
-      time.sleep(1)
+      time.sleep(1)#pause
       
       # This is where the bulk of the battle takes place
       self.do_player_actions()
@@ -62,7 +62,7 @@ class Battle:
         self.app.quit()
 
       player_action = int(player_action)
-      if player_action not in range(1,4):
+      if player_action not in range(1,4): #checks for 1 2 or 3
         raise ValueError
 
     except ValueError:
@@ -74,7 +74,7 @@ class Battle:
 
   def select_spell(self):
     """ Selects the spell the player would like to cast """
-    player_race = self.player.__class__.__name__
+    player_race = self.player.__class__.__name__ #players race
 
     try:
       self.app.write("Select your spell:")
@@ -86,21 +86,21 @@ class Battle:
         self.app.write("3. Mana Drain (no mp cost)")
       self.app.write("0. Cancel Spell")
       self.app.write("")
-      self.app.wait_variable(self.app.inputVariable)
-      spell_choice = self.app.inputVariable.get()
+      self.app.wait_variable(self.app.inputVariable)#take user input
+      spell_choice = self.app.inputVariable.get()#input variable
 
       if spell_choice == 'quit':
         self.app.quit()
       spell_choice = int(spell_choice)
-      if spell_choice == 0:
+      if spell_choice == 0: #cancel spell
         return False
-      valid_spell = self.player.valid_spell(spell_choice)
+      valid_spell = self.player.valid_spell(spell_choice) # checks if spell is availbale returns true or false
       if not valid_spell:
         raise ValueError
-    except ValueError:
+    except ValueError: #exception handling
       self.app.write("You must enter a valid choice")
       self.app.write("")
-      spell_choice = self.select_spell()
+      spell_choice = self.select_spell()#recall method
     
     return spell_choice
 
@@ -108,30 +108,30 @@ class Battle:
     """ Selects the target of the player's action """
     try:
       self.app.write("Choose your target:")
-      # use j to give a number option
-      j = 0
+      j = 0 # number ascociated with enemy
       while j < len(self.enemies):
-        if self.enemies[j].health > 0:
-          self.app.write(str(j) + ". " + self.enemies[j].name)
+        if self.enemies[j].health > 0: #check enemy in list of enemies is alive
+          self.app.write(str(j) + ". " + self.enemies[j].name) #prints user option
         j += 1
       self.app.write("")
-      self.app.wait_variable(self.app.inputVariable)
-      target = self.app.inputVariable.get()
+      self.app.wait_variable(self.app.inputVariable)#wait for user input
+      target = self.app.inputVariable.get()#input variable
 
       if target == 'quit':
         self.app.quit()
 
       target = int(target)
-      if not (target < len(self.enemies) and target >= 0) or self.enemies[target].health <= 0:
+      if not (target < len(self.enemies) and target >= 0) or self.enemies[target].health <= 0: #checks if user input is a valid number between number of enemies and 0 and checks if enemy is alive
         raise ValueError
-    except ValueError:
+    except ValueError:#exception handling
       self.app.write("You must enter a valid choice")
       self.app.write("")
-      target = self.choose_target()
+      target = self.choose_target() #recall function
 
-    return target
+    return target #returns index of enemy from enemy list
 
   def choose_stance(self):
+    """chooses stance of player"""
     try:
       self.app.write("Choose your stance:")
       self.app.write("a - Aggressive")
@@ -144,7 +144,7 @@ class Battle:
       if stance_choice == 'quit':
         self.app.quit()
 
-      if stance_choice not in 'adb' or stance_choice == '':
+      if stance_choice not in ['a','d','b'] or stance_choice == '':
         raise ValueError
 
     except ValueError:
@@ -161,47 +161,47 @@ class Battle:
   
     while not self.player_won and not turn_over:
 
-      self.player.print_status()
-      stance_choice = self.choose_stance()
-      self.player.set_stance(stance_choice)
+      self.player.print_status() #prints health mana and potions of player
+      stance_choice = self.choose_stance() #returns a, d, or b
+      self.player.set_stance(stance_choice)#sets attack and defense mod and prints you set this stance
       
-      player_action = self.get_action()
+      player_action = self.get_action() #returns 1,2 or 3
 
       has_attacked = False
      
-      if player_action == 3:
-        has_attacked = self.player.use_potion()
+      if player_action == 3: #uses potion
+        has_attacked = self.player.use_potion() #returns true or false
     
-      elif player_action == 2:
-        spell_choice = self.select_spell()
+      elif player_action == 2: #uses spell
+        spell_choice = self.select_spell() #returns 1 (fireball) 2 (shield) 3 (mana drain)
 
-        if spell_choice != 0:
-          has_attacked = True
-          if spell_choice == 1 or spell_choice == 3:
-            target = self.choose_target()
-            if self.player.cast_spell(spell_choice, self.enemies[target]):
+        if spell_choice != 0: #if spell choice is 0 than has attacked remains False
+          has_attacked = True #end move variable
+          if spell_choice == 1 or spell_choice == 3: #checks for attacking spell
+            target = self.choose_target()#returns number that is index of enemy in enemy list
+            if self.player.cast_spell(spell_choice, self.enemies[target]): #returns true if character kills enemy (using fireball)
               self.kills += 1
           else:
-            self.player.cast_spell(spell_choice)
+            self.player.cast_spell(spell_choice) #cast spell line 171 in character file
          
-      else:
-        target = self.choose_target()
+      else: #attacks enemy
+        target = self.choose_target() #returns index of enemy from enemy list
         has_attacked = True
 
-        if self.player.attack_enemy(self.enemies[target]):
+        if self.player.attack_enemy(self.enemies[target]):#returns true or false if enemy dies
           self.kills += 1
     
-      turn_over = True
-      if not has_attacked:
+      turn_over = True #variable that ends turn
+      if not has_attacked: #if player has not made valid move
         turn_over = False
       else:      
-        self.player_won = True
-        for enemy in self.enemies:
+        self.player_won = True #end game variable
+        for enemy in self.enemies:#if at least one enemy alive player won variable false
           if enemy.health > 0:
             self.player_won = False
             break
 
-        if self.player_won == True:
+        if self.player_won == True: #if player wins the game
           self.app.write("Your enemies have been vanquished!!")
           self.app.write("")
           time.sleep(1)
@@ -212,7 +212,7 @@ class Battle:
 
     turn_over = False
     
-    if not self.player_won:
+    if not self.player_won: #checks if player has not killed all enemies
       self.app.write("Enemies' Turn:")
       self.app.write("")
       time.sleep(1)
@@ -223,7 +223,7 @@ class Battle:
           if not self.player_lost:
             self.player_lost = enemy.move(self.player)
 
-      if self.player_lost == True:
+      if self.player_lost == True: #checks if player is killed
         self.app.write("You have been killed by your enemies.")
         self.app.write("")
         time.sleep(1)
