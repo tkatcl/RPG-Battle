@@ -20,6 +20,7 @@ class World:
         self.player = '☺'
         self.finish = '⚐'
         self.obstacle = '%'
+        self.enemies = '⚔'
         
         self.xlocation = self.xstart
         self.ylocation = self.ystart
@@ -34,22 +35,9 @@ class World:
         display.rstrip()
         return display
 
-    """def populate_enemies(self,difficulty):
-        if difficulty == 'easy':
-            enemies = self.size*0.4            
-        elif difficulty == 'medium':
-            enemies = self.size*0.6            
-        elif difficulty == 'hard':
-            enemies = self.size            
-        elif difficulty == 'legendary':
-            enemies = self.size*1.5
-        choice = [x for num in range(1,self.size-1)]
-        rows = 
-        while enemies > 0:
-     """
     def populate_obstacles(self):
-        obstacles = (self.size**2)*0.15
-        choices = [num for num in range(1,self.size-2)]
+        obstacles = (self.size**2)*0.1
+        choices = [num for num in range(1,self.size-1)]
         for x in range(int(obstacles)):
             while True:
                 obx = random.choice(choices)
@@ -59,6 +47,29 @@ class World:
                         if self.world[oby][obx+1] == '.' and self.world[oby][obx-1] == '.':          
                             self.world[oby][obx] = self.obstacle
                             break
+
+    def populate_enemies(self,difficulty):
+        if difficulty == 'easy':
+            enemies = (self.size**2)*0.05            
+        elif difficulty == 'medium':
+            enemies = (self.size**2)*0.15            
+        elif difficulty == 'hard':
+            enemies = (self.size**2)*0.25            
+        elif difficulty == 'legendary':
+            enemies = (self.size**2)*0.35
+
+        choices = [x for x in range(self.size)]
+
+        while enemies > 0:
+            for row in reversed(self.world):
+                for y in range(int(self.size*0.5)):
+                    xen = random.choice(choices)
+                    yen = random.choice(choices)
+                    if self.world[yen][xen] == '.' and enemies > 0:
+                        self.world[yen][xen] = self.enemies
+                        enemies-=1
+            
+            
 
     def invalid_direction(self,direction):
         invalid = True
@@ -111,6 +122,8 @@ class World:
         return direction
 
     def move_player(self,direction):
+        encounter = False
+        
         if self.xlocation == self.xend and self.ylocation == self.yend:
             self.world[self.ylocation][self.xlocation] = self.finish
         else:
@@ -118,24 +131,35 @@ class World:
             
         if direction == 'd':
             self.ylocation += 1
+            if self.world[self.ylocation][self.xlocation] ==  self.enemies:
+                encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'u':
             self.ylocation -= 1
+            if self.world[self.ylocation][self.xlocation] == self.enemies:
+                encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'l':
             self.xlocation -= 1
+            if self.world[self.ylocation][self.xlocation] == self.enemies:
+                encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'r':
             self.xlocation += 1
+            if self.world[self.ylocation][self.xlocation] == self.enemies:
+                encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         
-        # return if encounter enemy
+        return encounter
     
                 
 
 game_map = World(10,0,0,9,9)
 game_map.populate_obstacles()
+game_map.populate_enemies('easy')
 while True:
     app.write(game_map)
     direction = game_map.get_direction()
-    game_map.move_player(direction)
+    if game_map.move_player(direction):
+        app.write("This is where you encounter enemies")
+        #run battle
