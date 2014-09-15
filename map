@@ -1,0 +1,112 @@
+import gui
+
+app = gui.simpleapp_tk(None)
+app.title('RPG Battle')
+
+class World:
+
+    def __init__(self, size, xstart, ystart, xend, yend):
+        self.size = size
+        
+        self.world = [x[:] for x in [['.']*size]*size]
+        
+        self.xstart = xstart
+        self.ystart = ystart
+        
+        self.xend = xend
+        self.yend = yend
+        
+        self.player = '☺'
+        self.finish = '⚐'
+        
+        self.xlocation = self.xstart
+        self.ylocation = self.ystart
+        
+        self.world[self.ylocation][self.xlocation] = self.player
+        self.world[self.yend][self.xend] = self.finish
+
+    def __str__(self):
+        display = ''
+        for row in self.world:
+            display += str(''.join(row)) + '\n'
+        display.rstrip()
+        return display
+
+    def invalid_direction(self,direction):
+        invalid = True
+        
+        if direction == 'd':
+            if self.ylocation < self.size -1:
+                invalid = False
+                
+        elif direction == 'r':
+            if self.xlocation < self.size -1:
+                invalid = False
+                
+        elif direction == 'u':
+            if self.ylocation > 0:
+                invalid = False
+                
+        elif direction == 'l':
+            if self.xlocation > 0:
+                invalid = False
+
+        return invalid
+        
+    def get_direction(self):
+        app.write("Please select a direction:")
+        if self.ylocation < (self.size -1):
+            app.write("d - down")
+        if self.ylocation > 0:
+            app.write("u - up")
+        if self.xlocation > 0:
+            app.write("l - left")
+        if self.xlocation < (self.size - 1):
+            app.write("r - right")
+        app.write("")
+        app.wait_variable(app.inputVariable)
+        direction = app.inputVariable.get()
+        
+        if direction == 'quit':
+            app.quit()
+
+        if direction not in ['d','u','l','r']:
+            app.write("Invalid direction")
+            app.write("")
+            direction = self.get_direction()
+
+        if self.invalid_direction(direction):
+            app.write("You cannot move outside of the map")
+            app.write("")
+            direction = self.get_direction()
+
+        return direction
+
+    def move_player(self,direction):
+        if self.xlocation == self.xend and self.ylocation == self.yend:
+            self.world[self.ylocation][self.xlocation] = self.finish
+        else:
+            self.world[self.ylocation][self.xlocation] = '.'
+            
+        if direction == 'd':
+            self.ylocation += 1
+            self.world[self.ylocation][self.xlocation] = self.player
+        elif direction == 'u':
+            self.ylocation -= 1
+            self.world[self.ylocation][self.xlocation] = self.player
+        elif direction == 'l':
+            self.xlocation -= 1
+            self.world[self.ylocation][self.xlocation] = self.player
+        elif direction == 'r':
+            self.xlocation += 1
+            self.world[self.ylocation][self.xlocation] = self.player
+        
+        # return if encounter enemy
+
+                
+
+game_map = World(10,0,0,9,9)
+while True:
+    app.write(game_map)
+    direction = game_map.get_direction()
+    game_map.move_player(direction)
