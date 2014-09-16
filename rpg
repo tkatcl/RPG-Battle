@@ -11,6 +11,8 @@ import time
 import gui
 import character
 import battle
+import random
+import world
 
 app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
 
@@ -259,7 +261,33 @@ app.write("")
 difficulty = set_difficulty()#returns str of difficulty
 enemies = create_enemies(mode, difficulty)#returns list of enemy objects 
 
+game_map = world.World(20,0,0,9,9,app)
+game_map.populate_obstacles()
+game_map.populate_enemies(difficulty)
+
 while True:
+
+  moving = True
+
+  while moving:
+    app.write(game_map)
+    direction = game_map.get_direction()
+    if game_map.move_player(direction):
+        moving = False
+
+    app.write(game_map)
+    time.sleep(1)
+    
+    if moving and game_map.move_enemies(difficulty):
+      moving = False
+      
+  for x in range(20):
+    app.write("")
+  app.write("                                                      Geat ready to BATTLE!!!")
+  for x in range(20):
+    app.write("")
+    
+  time.sleep(5)
 
   encounter = battle.Battle(player, enemies, app) #instanciate battle from battle file
   battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
