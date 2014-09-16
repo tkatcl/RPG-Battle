@@ -1,13 +1,15 @@
-"""
 import random
 import time
 import gui
+
+"""
 app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
 app.title('RPG Battle') #name displayed on title bar
 """
+
 class World:
 
-    def __init__(self, size, xstart, ystart, xend, yend):
+    def __init__(self, size, xstart, ystart, xend, yend,app):
         self.size = size
         
         self.world = [x[:] for x in [['.']*size]*size]
@@ -22,6 +24,7 @@ class World:
         self.finish = '⚐'
         self.obstacle = '#'
         self.enemies = '⚔'
+        self.app = app
         
         self.xlocation = self.xstart
         self.ylocation = self.ystart
@@ -50,13 +53,13 @@ class World:
                             break
 
     def populate_enemies(self,difficulty):
-        if difficulty == 'easy':
+        if difficulty == 'e':
             enemies = int((self.size**2)*0.04)            
-        elif difficulty == 'medium':
+        elif difficulty == 'm':
             enemies = int((self.size**2)*0.06)            
-        elif difficulty == 'hard':
+        elif difficulty == 'h':
             enemies = int((self.size**2)*0.08)            
-        elif difficulty == 'legendary':
+        elif difficulty == 'l':
             enemies = int((self.size**2)*0.1)
 
         xchoices = [x for x in range(self.size)]
@@ -89,30 +92,30 @@ class World:
         return invalid
         
     def get_direction(self):
-        app.write("Please select a direction:")
+        self.app.write("Please select a direction:")
         if self.ylocation < (self.size -1):
-            app.write("d - down")
+            self.app.write("d - down")
         if self.ylocation > 0:
-            app.write("u - up")
+            self.app.write("u - up")
         if self.xlocation > 0:
-            app.write("l - left")
+            self.app.write("l - left")
         if self.xlocation < (self.size - 1):
-            app.write("r - right")
-        app.write("")
-        app.wait_variable(app.inputVariable)
-        direction = app.inputVariable.get()
+            self.app.write("r - right")
+        self.app.write("")
+        self.app.wait_variable(self.app.inputVariable)
+        direction = self.app.inputVariable.get()
         
         if direction == 'quit':
-            app.quit()
+            self.app.quit()
 
         if direction not in ['d','u','l','r']:
-            app.write("Invalid direction")
-            app.write("")
+            self.app.write("Invalid direction")
+            self.app.write("")
             direction = self.get_direction()
 
         if self.invalid_direction(direction):
-            app.write("You cannot go that way")
-            app.write("")
+            self.app.write("You cannot go that way")
+            self.app.write("")
             direction = self.get_direction()
 
         return direction
@@ -149,14 +152,14 @@ class World:
         return encounter
 
     def move_enemies(self,difficulty):
-        if difficulty == 'legendary':
+        if difficulty == 'l':
+            ranged = int(self.size*0.7)
+        elif difficulty == 'h':
             ranged = int(self.size*0.6)
-        elif difficulty == 'hard':
+        elif difficulty == 'm':
             ranged = int(self.size*0.5)
-        elif difficulty == 'medium':
-            ranged = int(self.size*4)
-        elif difficulty == 'easy':
-            ranged = int(self.size*0.3)
+        elif difficulty == 'e':
+            ranged = int(self.size*0.4)
 
         encounter = False
         
@@ -212,7 +215,7 @@ class World:
         return encounter
                            
 """                
-difficulty = 'medium'
+difficulty = 'm'
 game_map = World(20,0,0,9,9)
 game_map.populate_obstacles()
 game_map.populate_enemies(difficulty)
