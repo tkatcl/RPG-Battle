@@ -31,7 +31,7 @@ class World:
     def __str__(self):
         display = ''
         for row in self.world:
-            display += str(''.join(row)) + '\n'
+            display += str(' '.join(row)) + '\n'
         display.rstrip()
         return display
 
@@ -72,24 +72,19 @@ class World:
             
 
     def invalid_direction(self,direction):
-        invalid = True
-        
+        invalid = True       
         if direction == 'd':
             if self.ylocation < self.size -1 and self.world[self.ylocation+1][self.xlocation] != self.obstacle:
-                invalid = False
-                
+                invalid = False                
         elif direction == 'r':
             if self.xlocation < self.size -1 and self.world[self.ylocation][self.xlocation+1] != self.obstacle:
-                invalid = False
-                
+                invalid = False                
         elif direction == 'u':
             if self.ylocation > 0 and self.world[self.ylocation-1][self.xlocation] != self.obstacle:
-                invalid = False
-                
+                invalid = False                
         elif direction == 'l':
             if self.xlocation > 0 and self.world[self.ylocation][self.xlocation-1] != self.obstacle:
                 invalid = False
-
         return invalid
         
     def get_direction(self):
@@ -151,15 +146,63 @@ class World:
             self.world[self.ylocation][self.xlocation] = self.player
         
         return encounter
-    
-                
 
+    def move_enemies(self,difficulty):
+        if difficulty == 'legendary':
+            ranged = 5
+        elif difficulty == 'hard':
+            ranged = 4
+        elif difficulty == 'medium':
+            ranged = 3
+        elif difficulty == 'easy':
+            ranged = 2
+
+        #find difference use abs()
+        
+        for distance in range(1,ranged): #move enemies from right to player
+            if self.world[self.ylocation][self.xlocation+distance] == self.enemies:
+                if self.world[self.ylocation][self.xlocation+distance-1] == self.player:
+                    self.world[self.ylocation][self.xlocation+distance] = '.'
+                    app.write("This where the battle happens")
+                elif self.world[self.ylocation][self.xlocation+distance-1] == '.':
+                    self.world[self.ylocation][self.xlocation+distance] == '.'
+                    self.world[self.ylocation][self.xlocation+distance-1] == self.enemies          
+        for distance in range(1,ranged): #move enemies from left to player
+            if self.world[self.ylocation][self.xlocation-distance] == self.enemies:
+                if self.world[self.ylocation][self.xlocation-distance+1] == self.player:
+                    self.world[self.ylocation][self.xlocation-distance] = '.'
+                    app.write("This where the battle happens")
+                elif self.world[self.ylocation][self.xlocation-distance+1] == '.':
+                    self.world[self.ylocation][self.xlocation-distance] == '.'
+                    self.world[self.ylocation][self.xlocation-distance+1] == self.enemies
+        for distance in range(1,ranged): #move enemies from up to player
+            if self.world[self.ylocation+distance][self.xlocation] == self.enemies:
+                if self.world[self.ylocation+distance-1][self.xlocation] == self.player:
+                    self.world[self.ylocation+distance][self.xlocation] = '.'
+                    app.write("This where the battle happens")
+                elif self.world[self.ylocation+distance-1][self.xlocation] == '.':
+                    self.world[self.ylocation+distance][self.xlocation] == '.'
+                    self.world[self.ylocation+distance-1][self.xlocation] == self.enemies
+        for distance in range(1,ranged): #move enemies from down to player
+            if self.world[self.ylocation-distance][self.xlocation] == self.enemies:
+                if self.world[self.ylocation-distance+1][self.xlocation] == self.player:
+                    self.world[self.ylocation-distance][self.xlocation] = '.'
+                    app.write("This where the battle happens")
+                elif self.world[self.ylocation-distance+1][self.xlocation] == '.':
+                    self.world[self.ylocation-distance][self.xlocation] == '.'
+                    self.world[self.ylocation-distance+1][self.xlocation] == self.enemies
+            
+                        
+                           
+                
+difficulty = 'hard'
 game_map = World(10,0,0,9,9)
 game_map.populate_obstacles()
-game_map.populate_enemies('easy')
+game_map.populate_enemies(difficulty)
 while True:
     app.write(game_map)
     direction = game_map.get_direction()
     if game_map.move_player(direction):
         app.write("This is where you encounter enemies")
         #run battle
+    game_map.move_enemies(difficulty)
