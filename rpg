@@ -15,7 +15,6 @@ import random
 import world
 
 app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
-
 app.title('RPG Battle') #name displayed on title bar
 
 app.write('''
@@ -191,6 +190,10 @@ def set_difficulty():
     app.write("")
     difficulty = set_difficulty()#recall function
 
+  app.write("You have selected "+difficulty+" as your difficulty")
+  app.write("Good Luck!")
+  app.write("")
+
   return difficulty
 
 def create_enemies(mode, difficulty):
@@ -248,6 +251,7 @@ def print_results():
   app.write("Avg. kills per battle: {0:.2f}".format(float(kills)/battles))
   app.write("")
 
+
 battles = 0
 wins = 0
 kills = 0
@@ -259,55 +263,95 @@ player = create_player(mode, race, char_name)#instanciate player object
 app.write(player)#prints you are name the class
 app.write("")
 difficulty = set_difficulty()#returns str of difficulty
-enemies = create_enemies(mode, difficulty)#returns list of enemy objects 
+enemies = create_enemies(mode, difficulty)#returns list of enemy objects
 
-game_map = world.World(20,0,0,9,9,app)
+time.sleep(1)
+
+game_map = world.World(10,8,8,9,9,app)#has to be size 10 or greater
 game_map.populate_obstacles()
 game_map.populate_enemies(difficulty)
 
 while True:
 
   moving = True
+  finished = False
+  alive_enemies = True #check if enemies are still alive
 
   while moving:
     app.write(game_map)
     direction = game_map.get_direction()
     if game_map.move_player(direction):
-        moving = False
-
-    app.write(game_map)
-    time.sleep(1)
-    
-    if moving and game_map.move_enemies(difficulty):
       moving = False
       
-  for x in range(20):
-    app.write("")
-  app.write("                                                      Geat ready to BATTLE!!!")
-  for x in range(20):
-    app.write("")
+    if game_map.xlocation == game_map.xend and game_map.ylocation == game_map.yend:        
+        finished = True
+        moving = False
+
+    if moving == True and finished == False:
+      app.write(game_map)
+      time.sleep(1)
+      if game_map.move_enemies(difficulty):
+        moving = False
+
     
-  time.sleep(5)
 
-  encounter = battle.Battle(player, enemies, app) #instanciate battle from battle file
-  battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
+  if finished == False:    
+    for x in range(20):
+      app.write("")
+    app.write("                                                     ... Get ready to BATTLE!!!")
+    for x in range(20):
+      app.write("")
+      
+    time.sleep(5)
 
-  battles += 1
-  wins += battle_wins
-  kills += battle_kills
+    encounter = battle.Battle(player, enemies, app) #instanciate battle from battle file
+    battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
 
-  print_results()
+    battles += 1
+    wins += battle_wins
+    kills += battle_kills
+
+    print_results()
+
+  alive_enemies = game_map.check_for_enemies()
+
+  if alive_enemies == False:    
+    finished = True
     
-  quit = quit_game()
+  if finished == True:
+    if alive_enemies == False:
+      app.write("Congratulations, you have vanquished all your enemies")
+    else:
+      app.write("Congratulations, you made it to the finish alive!")
+    app.write("")
+    quit = quit_game()
 
-  if quit == "n":
-    app.write("Thank you for playing RPG Battle.")
-    time.sleep(2)
-    app.quit()
+    if quit == "n":
+      app.write("Thank you for playing RPG Battle.")
+      time.sleep(2)
+      app.quit()
 
-  else:
-    # Playing again - reset all enemies and players
-    player.reset()
-    for enemy in enemies:
-      enemy.reset()
+    else:
+      # Playing again - reset all enemies and players
+      player.reset()
+      for enemy in enemies:
+        enemy.reset()
+      
+      battles = 0
+      wins = 0
+      kills = 0
+
+      mode = set_mode() #return good or evil
+      race = set_race(mode) #set race based on good or evil
+      player = create_player(mode, race, char_name)#instanciate player object
+      app.write(player)#prints you are name the class
+      app.write("")
+      difficulty = set_difficulty()#returns str of difficulty
+      enemies = create_enemies(mode, difficulty)#returns list of enemy objects
+
+      time.sleep(1)
+
+      game_map.reset_map()
+      game_map.populate_obstacles()
+      game_map.populate_enemies(difficulty)
 
