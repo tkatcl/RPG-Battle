@@ -1,5 +1,6 @@
 import gui
 import random
+import time
 
 app = gui.simpleapp_tk(None)
 app.title('RPG Battle')
@@ -19,7 +20,7 @@ class World:
         
         self.player = '☺'
         self.finish = '⚐'
-        self.obstacle = '%'
+        self.obstacle = '#'
         self.enemies = '⚔'
         
         self.xlocation = self.xstart
@@ -50,24 +51,24 @@ class World:
 
     def populate_enemies(self,difficulty):
         if difficulty == 'easy':
-            enemies = (self.size**2)*0.05            
+            enemies = int((self.size**2)*0.04)            
         elif difficulty == 'medium':
-            enemies = (self.size**2)*0.15            
+            enemies = int((self.size**2)*0.07)            
         elif difficulty == 'hard':
-            enemies = (self.size**2)*0.25            
+            enemies = int((self.size**2)*0.1)            
         elif difficulty == 'legendary':
-            enemies = (self.size**2)*0.35
+            enemies = int((self.size**2)*0.15)
 
-        choices = [x for x in range(self.size)]
+        xchoices = [x for x in range(self.size)]
+        ychoices = [y for y in range(2,self.size)]
 
-        while enemies > 0:
-            for row in reversed(self.world):
-                for y in range(int(self.size*0.5)):
-                    xen = random.choice(choices)
-                    yen = random.choice(choices)
-                    if self.world[yen][xen] == '.' and enemies > 0:
-                        self.world[yen][xen] = self.enemies
-                        enemies-=1
+        for row in reversed(self.world):
+            for y in range(int(self.size*0.5)):
+                xen = random.choice(xchoices)
+                yen = random.choice(ychoices)
+                if self.world[yen][xen] == '.' and enemies > 0:
+                    self.world[yen][xen] = self.enemies
+                    enemies-=1
             
             
 
@@ -149,55 +150,58 @@ class World:
 
     def move_enemies(self,difficulty):
         if difficulty == 'legendary':
-            ranged = 5
+            ranged = int(self.size*0.6)
         elif difficulty == 'hard':
-            ranged = 4
+            ranged = int(self.size*0.5)
         elif difficulty == 'medium':
-            ranged = 3
+            ranged = int(self.size*4)
         elif difficulty == 'easy':
-            ranged = 2
+            ranged = int(self.size*0.3)
 
         #find difference use abs()
         
-        for distance in range(1,ranged): #move enemies from right to player
+        for distance in range(1,ranged+1): #move enemies from right to player
             if self.world[self.ylocation][self.xlocation+distance] == self.enemies:
                 if self.world[self.ylocation][self.xlocation+distance-1] == self.player:
                     self.world[self.ylocation][self.xlocation+distance] = '.'
                     app.write("This where the battle happens")
                 elif self.world[self.ylocation][self.xlocation+distance-1] == '.':
-                    self.world[self.ylocation][self.xlocation+distance] == '.'
-                    self.world[self.ylocation][self.xlocation+distance-1] == self.enemies          
-        for distance in range(1,ranged): #move enemies from left to player
+                    self.world[self.ylocation][self.xlocation+distance] = '.'
+                    self.world[self.ylocation][self.xlocation+distance-1] = self.enemies
+                        
+        for distance in range(1,ranged+1): #move enemies from left to player
             if self.world[self.ylocation][self.xlocation-distance] == self.enemies:
                 if self.world[self.ylocation][self.xlocation-distance+1] == self.player:
                     self.world[self.ylocation][self.xlocation-distance] = '.'
                     app.write("This where the battle happens")
                 elif self.world[self.ylocation][self.xlocation-distance+1] == '.':
-                    self.world[self.ylocation][self.xlocation-distance] == '.'
-                    self.world[self.ylocation][self.xlocation-distance+1] == self.enemies
-        for distance in range(1,ranged): #move enemies from up to player
+                    self.world[self.ylocation][self.xlocation-distance] = '.'
+                self.world[self.ylocation][self.xlocation-distance+1] = self.enemies
+                    
+        for distance in range(1,ranged+1): #move enemies from up to player
             if self.world[self.ylocation+distance][self.xlocation] == self.enemies:
                 if self.world[self.ylocation+distance-1][self.xlocation] == self.player:
                     self.world[self.ylocation+distance][self.xlocation] = '.'
                     app.write("This where the battle happens")
                 elif self.world[self.ylocation+distance-1][self.xlocation] == '.':
-                    self.world[self.ylocation+distance][self.xlocation] == '.'
-                    self.world[self.ylocation+distance-1][self.xlocation] == self.enemies
-        for distance in range(1,ranged): #move enemies from down to player
+                    self.world[self.ylocation+distance][self.xlocation] = '.'
+                    self.world[self.ylocation+distance-1][self.xlocation] = self.enemies
+
+        for distance in range(1,ranged+1): #move enemies from down to player
             if self.world[self.ylocation-distance][self.xlocation] == self.enemies:
                 if self.world[self.ylocation-distance+1][self.xlocation] == self.player:
                     self.world[self.ylocation-distance][self.xlocation] = '.'
                     app.write("This where the battle happens")
                 elif self.world[self.ylocation-distance+1][self.xlocation] == '.':
-                    self.world[self.ylocation-distance][self.xlocation] == '.'
-                    self.world[self.ylocation-distance+1][self.xlocation] == self.enemies
-            
+                    self.world[self.ylocation-distance][self.xlocation] = '.'
+                    self.world[(self.ylocation-distance)+1][self.xlocation] = self.enemies
+                
                         
                            
                 
-difficulty = 'hard'
+difficulty = 'legendary'
 game_map = World(10,0,0,9,9)
-game_map.populate_obstacles()
+#game_map.populate_obstacles()
 game_map.populate_enemies(difficulty)
 while True:
     app.write(game_map)
@@ -205,4 +209,6 @@ while True:
     if game_map.move_player(direction):
         app.write("This is where you encounter enemies")
         #run battle
+    app.write(game_map)
+    time.sleep(1)
     game_map.move_enemies(difficulty)
