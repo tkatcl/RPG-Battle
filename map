@@ -2,15 +2,10 @@ import random
 import time
 import gui
 
-"""
-app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
-app.title('RPG Battle') #name displayed on title bar
-"""
-
 class World:
 
-    def __init__(self, size, xstart, ystart, xend, yend,app):
-        self.size = size
+    def __init__(self, size, xstart, ystart, xend, yend, app):
+        self.size = size 
         
         self.world = [x[:] for x in [['.']*size]*size]
         
@@ -54,7 +49,7 @@ class World:
 
     def populate_enemies(self,difficulty):
         if difficulty == 'e':
-            enemies = int((self.size**2)*0.04)            
+            enemies = 1 #int((self.size**2)*0.04)            
         elif difficulty == 'm':
             enemies = int((self.size**2)*0.06)            
         elif difficulty == 'h':
@@ -130,25 +125,37 @@ class World:
             
         if direction == 'd':
             self.ylocation += 1
+            self.app.write("")
+            self.app.write("Moving down...")
+            self.app.write("")
             if self.world[self.ylocation][self.xlocation] ==  self.enemies:
                 encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'u':
             self.ylocation -= 1
+            self.app.write("")
+            self.app.write("Moving up...")
+            self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'l':
             self.xlocation -= 1
+            self.app.write("")
+            self.app.write("Moving left...")
+            self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'r':
             self.xlocation += 1
+            self.app.write("")
+            self.app.write("Moving right...")
+            self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
             self.world[self.ylocation][self.xlocation] = self.player
-        
+        time.sleep(0.5)
         return encounter
 
     def move_enemies(self,difficulty):
@@ -162,6 +169,10 @@ class World:
             ranged = int(self.size*0.4)
 
         encounter = False
+
+        self.app.write("Enemies Moving...")
+        self.app.write("")
+        
         
         for distance in range(1,ranged+1): #move enemies from right to player
             try:
@@ -213,21 +224,24 @@ class World:
                     break
                 
         return encounter
-                           
-"""                
-difficulty = 'm'
-game_map = World(20,0,0,9,9)
-game_map.populate_obstacles()
-game_map.populate_enemies(difficulty)
-while True:
-    app.write(game_map)
-    direction = game_map.get_direction()
-    if game_map.move_player(direction):
-        app.write("This is where you encounter enemies")
-    app.write(game_map)
-    time.sleep(1)
-    if game_map.move_enemies(difficulty):
-        app.write("This is where you encounter enemies")
-"""
+    def reset_map(self):
+        self.world = [x[:] for x in [['.']*self.size]*self.size]
 
+        self.xlocation = self.xstart
+        self.ylocation = self.ystart
+        
+        self.world[self.ylocation][self.xlocation] = self.player
+        self.world[self.yend][self.xend] = self.finish
+
+    def check_for_enemies(self):
+        alive_enemies = False
+        for row in self.world:
+            for x in row:
+                if x == self.enemies:
+                    alive_enemies = True
+                    break
+
+        return alive_enemies
+
+        
 
