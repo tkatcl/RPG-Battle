@@ -1,11 +1,10 @@
+"""
 import random
 import time
 import gui
-
 app = gui.simpleapp_tk(None)#instanciate gui (None is no parent)
-
 app.title('RPG Battle') #name displayed on title bar
-
+"""
 class World:
 
     def __init__(self, size, xstart, ystart, xend, yend):
