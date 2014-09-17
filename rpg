@@ -220,6 +220,30 @@ def create_enemies(mode, difficulty):
 
   return enemies #list of enemy objects
 
+def create_allies(mode, difficulty):
+  """ Create the allies """
+  if mode == 2: # Evil Mode - evil allies
+    if difficulty == 'm':
+      allies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app), character.Orc("Sharku", app)] #goblin,goblin,orc (medium)
+    elif difficulty == 'h':
+      allies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
+    elif difficulty == 'l':
+      allies = [character.Orc("Grishnakh", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #orc,uruk,wizard (legendary)
+    else:
+      allies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)    
+
+  else: # Good Mode - good allies
+    if difficulty == 'm':
+      allies = [character.Hobbit("Peregrin", app), character.Hobbit("Meriadoc", app), character.Human("Eowyn", app)] #hobbit,hobbit,human (medium)
+    elif difficulty == 'h':
+      allies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]#dwarf,elf,human (hard)
+    elif difficulty == 'l':
+      allies = [character.Human("Faramir", app), character.Human("Aragorn", app), character.Wizard("Gandalf", app)]#human,human,wizard (legendary)
+    else:
+      allies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]#hobbit,hobbit (easy)
+
+  return allies #list of enemy objects
+
 def quit_game():
   """ Quits the game """
   try:
@@ -251,6 +275,26 @@ def print_results():
   app.write("Avg. kills per battle: {0:.2f}".format(float(kills)/battles))
   app.write("")
 
+def print_lives(player_lives):
+  if player_lives == 0:
+    app.write("You have no lives remaining")
+    app.write("")
+  elif player_lives > 0:
+    line = 'Lives remaining: '
+    for live in range(player_lives):
+      line += '♥ '
+    line = line.rstrip()
+    app.write(line)
+
+
+def reset_characters(enemies,allies,player):
+  for enemy in enemies:
+    enemy.reset()
+  for ally in allies:
+    ally.reset
+  player.reset()
+    
+  
 
 battles = 0
 wins = 0
@@ -264,20 +308,34 @@ app.write(player)#prints you are name the class
 app.write("")
 difficulty = set_difficulty()#returns str of difficulty
 enemies = create_enemies(mode, difficulty)#returns list of enemy objects
+allies = create_allies(mode, difficulty)
 
 time.sleep(1)
 
-game_map = world.World(10,8,8,9,9,app)#has to be size 10 or greater
+game_map = world.World(20,0,0,9,9,app)#has to be size 10 or greater
 game_map.populate_obstacles()
-game_map.populate_enemies(difficulty)
+num_enemies = game_map.populate_enemies(difficulty)
 
+if difficulty == 'e':
+  player_lives = int(num_enemies*1)
+elif difficulty == 'm':
+  player_lives = int(num_enemies*0.75)
+elif difficulty == 'h':
+  player_lives = int(num_enemies*0.5)
+elif difficulty == 'l':
+  player_lives = int(num_enemies * 0.25)
+
+alive = True
+  
 while True:
 
   moving = True
   finished = False
   alive_enemies = True #check if enemies are still alive
+  
+  print_lives(player_lives)
 
-  while moving:
+  while alive and moving:
     app.write(game_map)
     direction = game_map.get_direction()
     if game_map.move_player(direction):
@@ -304,22 +362,34 @@ while True:
       
     time.sleep(5)
 
-    encounter = battle.Battle(player, enemies, app) #instanciate battle from battle file
+    encounter = battle.Battle(player, enemies, allies, app) #instanciate battle from battle file
     battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
 
+    if battle_wins == 0:
+      player_lives -= 1
+      
     battles += 1
     wins += battle_wins
     kills += battle_kills
 
     print_results()
 
+  if player_lives < 0:
+    alive = False
+    finished = True
+    
   alive_enemies = game_map.check_for_enemies()
 
   if alive_enemies == False:    
     finished = True
+
+  if finished == False:
+    reset_characters(enemies,allies,player)
     
   if finished == True:
-    if alive_enemies == False:
+    if alive == False:
+      app.write("Game over, you have been vanquished by your enemies")
+    elif alive_enemies == False:
       app.write("Congratulations, you have vanquished all your enemies")
     else:
       app.write("Congratulations, you made it to the finish alive!")
@@ -348,10 +418,21 @@ while True:
       app.write("")
       difficulty = set_difficulty()#returns str of difficulty
       enemies = create_enemies(mode, difficulty)#returns list of enemy objects
-
       time.sleep(1)
 
       game_map.reset_map()
       game_map.populate_obstacles()
-      game_map.populate_enemies(difficulty)
+      num_enemies = game_map.populate_enemies(difficulty)
+      if difficulty == 'e':
+        player_lives = int(num_enemies*1.5)
 
+      elif difficulty == 'm':
+        player_lives = num_enemies
+
+      elif difficulty == 'h':
+        player_lives = int(num_enemies*0.5)
+
+      elif difficulty == 'l':
+        player_lives = int(num_enemies * 0.25)
+
+      alive = True
