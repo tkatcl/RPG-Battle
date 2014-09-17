@@ -49,13 +49,15 @@ class World:
 
     def populate_enemies(self,difficulty):
         if difficulty == 'e':
-            enemies = 1 #int((self.size**2)*0.04)            
+            enemies = int((self.size**2)*0.04)            
         elif difficulty == 'm':
             enemies = int((self.size**2)*0.06)            
         elif difficulty == 'h':
             enemies = int((self.size**2)*0.08)            
         elif difficulty == 'l':
             enemies = int((self.size**2)*0.1)
+
+        num_enemies = enemies    
 
         xchoices = [x for x in range(self.size)]
         ychoices = [y for y in range(2,self.size)]
@@ -67,7 +69,7 @@ class World:
                 if self.world[yen][xen] == '.' and enemies > 0:
                     self.world[yen][xen] = self.enemies
                     enemies-=1
-            
+        return num_enemies    
             
 
     def invalid_direction(self,direction):
@@ -76,7 +78,7 @@ class World:
             if self.ylocation < self.size -1 and self.world[self.ylocation+1][self.xlocation] != self.obstacle:
                 invalid = False                
         elif direction == 'r':
-            if self.xlocation < self.size -1 and self.world[self.ylocation][self.xlocation+1] != self.obstacle:
+            if self.xlocation < self.size -1 and self.world[self.ylocation][self.xlocation+1] != self.obstacle: 
                 invalid = False                
         elif direction == 'u':
             if self.ylocation > 0 and self.world[self.ylocation-1][self.xlocation] != self.obstacle:
@@ -160,13 +162,13 @@ class World:
 
     def move_enemies(self,difficulty):
         if difficulty == 'l':
-            ranged = int(self.size*0.7)
-        elif difficulty == 'h':
             ranged = int(self.size*0.6)
-        elif difficulty == 'm':
+        elif difficulty == 'h':
             ranged = int(self.size*0.5)
-        elif difficulty == 'e':
+        elif difficulty == 'm':
             ranged = int(self.size*0.4)
+        elif difficulty == 'e':
+            ranged = int(self.size*0.3)
 
         encounter = False
 
@@ -176,6 +178,8 @@ class World:
         
         for distance in range(1,ranged+1): #move enemies from right to player
             try:
+                if self.xlocation+distance > self.size -1:
+                    break
                 if self.world[self.ylocation][self.xlocation+distance] == self.enemies:
                     if self.world[self.ylocation][self.xlocation+distance-1] == self.player:
                         self.world[self.ylocation][self.xlocation+distance] = '.'
@@ -189,6 +193,8 @@ class World:
         if encounter == False:                
             for distance in range(1,ranged+1): #move enemies from left to player
                 try:
+                    if self.xlocation-distance < 0:
+                        break
                     if self.world[self.ylocation][self.xlocation-distance] == self.enemies:
                         if self.world[self.ylocation][self.xlocation-distance+1] == self.player:
                             self.world[self.ylocation][self.xlocation-distance] = '.'
@@ -201,6 +207,8 @@ class World:
         if encounter == False:            
             for distance in range(1,ranged+1): #move enemies from up to player
                 try:
+                    if self.ylocation + distance > self.size - 1:
+                        break
                     if self.world[self.ylocation+distance][self.xlocation] == self.enemies:
                         if self.world[self.ylocation+distance-1][self.xlocation] == self.player:
                             self.world[self.ylocation+distance][self.xlocation] = '.'
@@ -213,6 +221,8 @@ class World:
         if encounter == False:
             for distance in range(1,ranged+1): #move enemies from down to player
                 try:
+                    if self.ylocation - distance < 0:
+                        break
                     if self.world[self.ylocation-distance][self.xlocation] == self.enemies:
                         if self.world[self.ylocation-distance+1][self.xlocation] == self.player:
                             self.world[self.ylocation-distance][self.xlocation] = '.'
@@ -242,6 +252,3 @@ class World:
                     break
 
         return alive_enemies
-
-        
-
