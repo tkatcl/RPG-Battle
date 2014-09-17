@@ -9,16 +9,18 @@ Python RPG Assignment 2014
 # import modules
 import sys
 import time
+import random
 
 class Battle:
 
-  def __init__(self, player, enemies, app):
+  def __init__(self, player, enemies, allies, app):
     """
     Instantiates a battle object between the players and enemies specified,
     sending output to the given gui instance
     """
     self.player = player
     self.enemies = enemies
+    self.allies = allies
     self.app = app
     self.turn = 1
     self.wins = 0
@@ -40,6 +42,7 @@ class Battle:
       
       # This is where the bulk of the battle takes place
       self.do_player_actions()
+      self.do_allies_actions()
       self.do_enemy_actions()
       
       # advance turn counter
@@ -138,8 +141,8 @@ class Battle:
       self.app.write("d - Defensive")
       self.app.write("b - Balanced")
       self.app.write("")
-      self.app.wait_variable(self.app.inputVariable)
-      stance_choice = self.app.inputVariable.get()
+      self.app.wait_variable(self.app.inputVariable)#user input
+      stance_choice = self.app.inputVariable.get()#input variable
 
       if stance_choice == 'quit':
         self.app.quit()
@@ -147,10 +150,10 @@ class Battle:
       if stance_choice not in ['a','d','b'] or stance_choice == '':
         raise ValueError
 
-    except ValueError:
+    except ValueError: #exception handling
       self.app.write("You must enter a valid choice")
       self.app.write("")
-      stance_choice = self.choose_stance()
+      stance_choice = self.choose_stance()#recall function
     
     return stance_choice
 
@@ -211,6 +214,8 @@ class Battle:
     """ Performs the enemies' actions """
 
     turn_over = False
+    enemies_choices = self.allies
+    enemies_choices.append(self.player)
     
     if not self.player_won: #checks if player has not killed all enemies
       self.app.write("Enemies' Turn:")
@@ -219,11 +224,47 @@ class Battle:
     
       for enemy in self.enemies:
         if enemy.health > 0 and not self.player_lost:
-
           if not self.player_lost:
-            self.player_lost = enemy.move(self.player)
+            chosen = False
+            while chosen == False:
+              target = random.choice(enemies_choices)
+              if target.health > 0:
+                chosen = True
+
+            if target == self.player: 
+              self.player_lost = enemy.move(self.player)
+            else:
+              enemy.move(target)
+              self.player_lost = False
 
       if self.player_lost == True: #checks if player is killed
         self.app.write("You have been killed by your enemies.")
         self.app.write("")
         time.sleep(1)
+
+  def do_allies_actions(self):
+    turn_over = False
+    allies_choices = self.enemies
+
+    if not self.player_won:
+      self.app.write("Allies' Turn:")
+      self.app.write("")
+      time.sleep(1)
+
+      for ally in self.allies:
+        if ally.health > 0 and not self.player_won:
+          if not self.player_won:
+            while True:
+              target = random.choice(allies_choices)
+              if target.health > 0:
+                break
+              
+            self.player_won = ally.move(target)
+
+    if self.player_won == True: #if player wins the game
+        self.app.write("Your enemies have been vanquished by your allies!!")
+        self.app.write("")
+        time.sleep(1)
+        self.wins += 1
+          
+          
