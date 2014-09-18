@@ -80,20 +80,30 @@ class Character:
       self.app.write(self.name + " scores a critical hit! Double damage inflicted!!")
       time.sleep(1)
 
-    kill = target.defend_attack(hit) #returns true or false if enemy dies
+    kill,counter = target.defend_attack(hit) #returns true or false if enemy dies
     time.sleep(1)
 
-    if kill:
+    if counter:
+      self.app.write(target.name + " successfully manages to counter the attack against " + self.name)
+      target.attack_enemy(self)
+      time.sleep(1)
+
+    elif kill:
       self.app.write(self.name + " has killed " + target.name + ".") #prints character has killed enemy
       self.app.write("")
       time.sleep(1)
       return True      
     else:
+      self.app.write("Counter attack unsuccessful")
+      self.app.write("")
+      time.sleep(1)
       return False
 
   def defend_attack(self, att_damage):
     ''' Defends an attack from the enemy. Accepts the "hit" score of the attacking enemy as
     a parameter. Returns True is character dies, False if still alive.'''
+
+    counter = False
     
     # defend roll
     defend_roll = random.randint(1, 20)#number from 1 to 20
@@ -105,6 +115,9 @@ class Character:
       self.app.write(self.name + " successfully blocks the attack!")
       block = att_damage #blocks all damage
       time.sleep(1)
+      counter_chance = random.randint(1,2)
+      if counter_chance == 1:
+        counter = True
 
     # Calculate damage from attack
     damage = att_damage - block
@@ -137,12 +150,12 @@ class Character:
       self.app.write(self.name + " is dead!")
       self.app.write("")
       time.sleep(1)
-      return True
+      return (True, counter)
     else:
       self.app.write(self.name + " has " + str(self.health) + " hit points left")
       self.app.write("")
       time.sleep(1)
-      return False
+      return (False, counter)
 
 #### Character Magic Actions ####
 
@@ -290,6 +303,30 @@ class Character:
       self.app.write("")
       return False
 
+  def use_elixer(self):
+    if self.elixers >= 1:
+      if self.mana < self.max_mana:
+        self.elixers -= 1
+        self.mana += 100
+        if self.mana > self.max_mana:
+          self.mana = self.max_mana
+        self.app.write(self.name + " uses an elixer!")
+        time.sleep(1)
+        self.app.write(self.name + " has " + str(self.mana) + " mana points.")
+        self.app.write("")
+        time.sleep(1)
+        return True
+      else:
+        self.app.write("You do not need an elixer")
+        self.app.write("")
+        return False
+    else:
+      self.app.write("You have no elixers left!")
+      if self.mana == self.max_mana:
+        self.app.write("And you do not need an exlixer")
+      self.app.write("")
+      return False 
+    
 #### Miscellaneous Character Actions ####
 
   def reset(self):
@@ -365,6 +402,7 @@ class Dwarf(Character):
     self.max_health = 300;
     self.max_mana = 30;
     self.starting_potions = 1;
+    self.starting_elixers = 1 
     self.attack = 9;
     self.defense = 6;
     self.magic = 4;
@@ -372,6 +410,7 @@ class Dwarf(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Dwarf class """
@@ -391,6 +430,7 @@ class Elf(Character):
     self.max_health = 300;
     self.max_mana = 60;
     self.starting_potions = 1;
+    self.starting_elixers = 1
     self.attack = 6;
     self.defense = 8;
     self.magic = 8;
@@ -398,6 +438,7 @@ class Elf(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Elf class """
@@ -420,6 +461,7 @@ class Goblin(Character):
     self.max_health = 100;
     self.max_mana = 0;
     self.starting_potions = 0;
+    self.starting_elixers = 0
     self.attack = 3;
     self.defense = 3;
     self.magic = 0;
@@ -427,6 +469,7 @@ class Goblin(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Goblin class """
@@ -446,6 +489,7 @@ class Hobbit(Character):
     self.max_health = 250;
     self.max_mana = 40;
     self.starting_potions = 2;
+    self.starting_elixers = 2
     self.attack = 3;
     self.defense = 9;
     self.magic = 6;
@@ -453,6 +497,7 @@ class Hobbit(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Hobbit class """
@@ -476,6 +521,7 @@ class Human(Character):
     self.max_health = 250;
     self.max_mana = 40;
     self.starting_potions = 1;
+    self.starting_elixers = 2
     self.attack = 7;
     self.defense = 8;
     self.magic = 5;
@@ -483,6 +529,7 @@ class Human(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Human class """
@@ -510,6 +557,7 @@ class Orc(Character):
     self.max_health = 250;
     self.max_mana = 0;
     self.starting_potions = 0;
+    self.starting_elixers = 0
     self.attack = 7;
     self.defense = 5;
     self.magic = 2;
@@ -517,6 +565,7 @@ class Orc(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Orc class """
@@ -536,6 +585,7 @@ class Uruk(Character):
     self.max_health = 400;
     self.max_mana = 20;
     self.starting_potions = 1;
+    self.starting_elixers = 0
     self.attack = 9;
     self.defense = 7;
     self.magic = 4;
@@ -543,6 +593,7 @@ class Uruk(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Uruk class """
@@ -562,6 +613,7 @@ class Wizard(Character):
     self.max_health = 150;
     self.max_mana = 100;
     self.starting_potions = 2;
+    self.starting_elixers = 3
     self.attack = 5;
     self.defense = 6;
     self.magic = 10;
@@ -569,6 +621,7 @@ class Wizard(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     """ Defines the AI for the Wizard class """
@@ -591,6 +644,7 @@ class Devil(Character):
     self.max_health = 500;
     self.max_mana = 200;
     self.starting_potions = 3;
+    self.starting_elixers = 2
     self.attack = 8;
     self.defense = 4;
     self.magic = 15;
@@ -598,6 +652,7 @@ class Devil(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     move_complete = Character.move(self,player)
@@ -608,16 +663,12 @@ class Devil(Character):
         self.set_stance('b')
       else:
         self.set_stance('d')
-
       if self.mana < 10 and player.mana > 0:#if enemy has low mana and player has mana 
         self.cast_spell(3, player)#cast mana drain
-
       elif self.health > 100 and self.mana >= 10:
         return self.cast_spell(1, player)
-
       elif self.shield == 0 and self.mana >= 20:
         self.cast_spell(2)
-
       else:
         return self.attack_enemy(player)
 
@@ -629,6 +680,7 @@ class God(Character):
     self.max_health = 500;
     self.max_mana = 200;
     self.starting_potions = 3;
+    self.starting_elixers = 3
     self.attack = 8;
     self.defense = 4;
     self.magic = 15;
@@ -636,6 +688,7 @@ class God(Character):
     self.health = self.max_health;
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
+    self.elixers = self.starting_elixers
 
   def move(self, player):
     move_complete = Character.move(self,player)
@@ -646,16 +699,12 @@ class God(Character):
         self.set_stance('b')
       else:
         self.set_stance('d')
-
       if self.mana < 10 and player.mana > 0:#if enemy has low mana and player has mana 
         self.cast_spell(3, player)#cast mana drain
-
       elif self.health > 100 and self.mana >= 10:
         return self.cast_spell(1, player)
-
       elif self.shield == 0 and self.mana >= 20:
         self.cast_spell(2)
-
       else:
         return self.attack_enemy(player)
 
