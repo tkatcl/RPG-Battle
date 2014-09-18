@@ -355,9 +355,16 @@ while True:
     time.sleep(5)
 
     encounter = battle.Battle(player, enemies, allies, app) #instanciate battle from battle file
-    battle_wins, battle_kills = encounter.play() #play method returns win or loose and number of kills
+    battle_wins, battle_kills, flee = encounter.play() #play method returns win or loose and number of kills
 
-    if battle_wins == 0:
+    if flee == 'fled':
+      game_map.after_battle(direction,battle_wins)
+
+    elif flee == 'died':
+      player_lives -= 1
+      game_map.after_battle(direction,battle_wins)                            
+
+    elif battle_wins == 0:
       player_lives -= 1
       game_map.after_battle(direction,battle_wins)
     else:
