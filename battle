@@ -42,7 +42,6 @@ class Battle:
       
       # This is where the bulk of the battle takes place
       flee = self.do_player_actions()
-      self.app.write(flee)
       if flee != 'fled' and flee != 'died':
         self.do_allies_actions()
         self.do_enemy_actions()
@@ -61,6 +60,7 @@ class Battle:
       self.app.write("2. Cast Magic")
       self.app.write("3. Use Potion")
       self.app.write("4. Flee")
+      self.app.write("5. Special ability")
       self.app.write("")
       self.app.wait_variable(self.app.inputVariable)
       player_action = self.app.inputVariable.get()
@@ -169,7 +169,7 @@ class Battle:
       succesfull = False
       self.app.write("You were killed while fleeing the battle!")
     else:
-      self.app.write("You have successfully fleed the battle!")
+      self.app.write("You have successfully fled the battle!")
 
     self.app.write("")
       
