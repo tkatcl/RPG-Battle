@@ -213,9 +213,7 @@ class Battle:
   def do_enemy_actions(self):
     """ Performs the enemies' actions """
 
-    turn_over = False
     enemies_choices = self.allies
-    enemies_choices.append(self.player)
     
     if not self.player_won: #checks if player has not killed all enemies
       self.app.write("Enemies' Turn:")
@@ -226,15 +224,21 @@ class Battle:
         if enemy.health > 0 and not self.player_lost:
           if not self.player_lost:
             chosen = False
-            while chosen == False:
-              target = random.choice(enemies_choices)
-              if target.health > 0:
-                chosen = True
+            induced = [1,2,3,4]
+            if random.choice(induced) == 1:
+              target = self.player
+            else:
+              while chosen == False:
+                target = random.choice(enemies_choices)
+                if target.health > 0:
+                  chosen = True
 
             if target == self.player: 
               self.player_lost = enemy.move(self.player)
             else:
               enemy.move(target)
+              if target.health <= 0:
+                enemies_choices.remove(target)
               self.player_lost = False
 
       if self.player_lost == True: #checks if player is killed
@@ -243,14 +247,12 @@ class Battle:
         time.sleep(1)
 
   def do_allies_actions(self):
-    turn_over = False
     allies_choices = self.enemies
 
     if not self.player_won:
       self.app.write("Allies' Turn:")
       self.app.write("")
       time.sleep(1)
-
       for ally in self.allies:
         if ally.health > 0 and not self.player_won:
           if not self.player_won:
@@ -259,7 +261,12 @@ class Battle:
               if target.health > 0:
                 break
               
-            self.player_won = ally.move(target)
+            ally.move(target)
+            self.player_won = True
+            for player in allies_choices:
+              if player.health > 0:
+                self.player_won = False
+                break
 
     if self.player_won == True: #if player wins the game
         self.app.write("Your enemies have been vanquished by your allies!!")
