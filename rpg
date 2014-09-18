@@ -189,11 +189,6 @@ def set_difficulty():
     app.write("You must enter a valid choice")
     app.write("")
     difficulty = set_difficulty()#recall function
-
-  app.write("You have selected "+difficulty+" as your difficulty")
-  app.write("Good Luck!")
-  app.write("")
-
   return difficulty
 
 def create_enemies(mode, difficulty):
@@ -293,9 +288,7 @@ def reset_characters(enemies,allies,player):
   for ally in allies:
     ally.reset
   player.reset()
-    
-  
-
+      
 battles = 0
 wins = 0
 kills = 0
@@ -307,23 +300,24 @@ player = create_player(mode, race, char_name)#instanciate player object
 app.write(player)#prints you are name the class
 app.write("")
 difficulty = set_difficulty()#returns str of difficulty
+app.write("You have selected "+difficulty+" as your difficulty"+'\n' + "Good Luck!" + '\n')
 enemies = create_enemies(mode, difficulty)#returns list of enemy objects
 allies = create_allies(mode, difficulty)
 
 time.sleep(1)
 
-game_map = world.World(20,0,0,9,9,app)#has to be size 10 or greater
+game_map = world.World(10,0,0,9,9,app)#has to be size 10 or greater
 game_map.populate_obstacles()
 num_enemies = game_map.populate_enemies(difficulty)
 
 if difficulty == 'e':
-  player_lives = int(num_enemies*1)
-elif difficulty == 'm':
   player_lives = int(num_enemies*0.75)
+elif difficulty == 'm':
+  player_lives = int(num_enemies*0.6)
 elif difficulty == 'h':
-  player_lives = int(num_enemies*0.5)
+  player_lives = int(num_enemies*0.45)
 elif difficulty == 'l':
-  player_lives = int(num_enemies * 0.25)
+  player_lives = int(num_enemies * 0.3)
 
 alive = True
   
@@ -349,9 +343,7 @@ while True:
       app.write(game_map)
       time.sleep(1)
       if game_map.move_enemies(difficulty):
-        moving = False
-
-    
+        moving = False    
 
   if finished == False:    
     for x in range(20):
@@ -367,6 +359,9 @@ while True:
 
     if battle_wins == 0:
       player_lives -= 1
+      game_map.after_battle(direction,battle_wins)
+    else:
+      game_map.after_battle(direction,battle_wins)
       
     battles += 1
     wins += battle_wins
