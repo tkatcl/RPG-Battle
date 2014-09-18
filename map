@@ -181,56 +181,8 @@ class World:
 
         self.app.write("Enemies Moving...")
         self.app.write("")
-        
-        
-                        self.world[self.ylocation][self.xlocation+distance-1] = self.enemies
-            except IndexError:
-                break
                 
-        if encounter == False:                
-            for distance in range(1,ranged+1): #move enemies from left to player
-                try:
-                    if self.xlocation-distance < 0:
-                        break
-                    if self.world[self.ylocation][self.xlocation-distance] == self.enemies:
-                        if self.world[self.ylocation][self.xlocation-distance+1] == self.player:
-                            self.world[self.ylocation][self.xlocation-distance] = '.'
-                            encounter = True
-                        elif self.world[self.ylocation][self.xlocation-distance+1] == '.':
-                            self.world[self.ylocation][self.xlocation-distance] = '.'
-                        self.world[self.ylocation][self.xlocation-distance+1] = self.enemies
-                except IndexError:
-                    break
-        if encounter == False:            
-            for distance in range(1,ranged+1): #move enemies from up to player
-                try:
-                    if self.ylocation + distance > self.size - 1:
-                        break
-                    if self.world[self.ylocation+distance][self.xlocation] == self.enemies:
-                        if self.world[self.ylocation+distance-1][self.xlocation] == self.player:
-                            self.world[self.ylocation+distance][self.xlocation] = '.'
-                            encounter = True
-                        elif self.world[self.ylocation+distance-1][self.xlocation] == '.':
-                            self.world[self.ylocation+distance][self.xlocation] = '.'
-                            self.world[self.ylocation+distance-1][self.xlocation] = self.enemies
-                except IndexError:
-                    break
-        if encounter == False:
-            for distance in range(1,ranged+1): #move enemies from down to player
-                try:
-                    if self.ylocation - distance < 0:
-                        break
-                    if self.world[self.ylocation-distance][self.xlocation] == self.enemies:
-                        if self.world[self.ylocation-distance+1][self.xlocation] == self.player:
-                            self.world[self.ylocation-distance][self.xlocation] = '.'
-                            encounter = True
-                        elif self.world[self.ylocation-distance+1][self.xlocation] == '.':
-                            self.world[self.ylocation-distance][self.xlocation] = '.'
-                            self.world[(self.ylocation-distance)+1][self.xlocation] = self.enemies
-                except IndexError:
-                    break
-                
-        return encounter        for distance in range(1,ranged+1): #move enemies from right to player
+        for distance in range(1,ranged+1): #move enemies from right to player
             try:
                 if self.xlocation+distance > self.size -1:
                     break
@@ -331,3 +283,4 @@ class World:
         
            
             
+
