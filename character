@@ -25,7 +25,7 @@ class Character:
     self.defense_mod = 1.0
     self.name = char_name
     self.shield = 0
-    self.max_shield = 50
+    self.max_shield = 75
     self.app = app
 
   def __str__(self):
@@ -191,7 +191,7 @@ class Character:
     self.app.write(self.name + " casts Fireball on " + target.name + "!")#prints you attack enemy with fireball
     time.sleep(1)
       
-    roll = random.randint(1, 10) #random number from 1 up to 10
+    roll = random.randint(10, 16) #random number from 1 up to 10
     defense_roll = random.randint(1, 10) #random number from 1 up to 10
     damage = int(roll * self.magic) - int(defense_roll * target.resistance) #.magic and .resistance in character constructor method
     if damage < 0:
@@ -256,6 +256,9 @@ class Character:
     else:
       self.app.write(target.name + " has " + str(target.mana) + " mana left")
     self.app.write("")
+
+    def special_ability(self,mana,target):
+      pass
 
 #### Character Item Actions ####
 
@@ -581,4 +584,83 @@ class Wizard(Character):
       else:
         return self.attack_enemy(player)#return true if player dies
     return False
+
+class Devil(Character):
+  def __init__(self, char_name, app):
+    Character.__init__(self, char_name, app)
+    self.max_health = 500;
+    self.max_mana = 200;
+    self.starting_potions = 3;
+    self.attack = 8;
+    self.defense = 4;
+    self.magic = 15;
+    self.resistance = 10;
+    self.health = self.max_health;
+    self.mana = self.max_mana;
+    self.potions = self.starting_potions;
+
+  def move(self, player):
+    move_complete = Character.move(self,player)
+    if not move_complete:
+      if self.health > 100:
+        self.set_stance('a')
+      elif self.health > 50:
+        self.set_stance('b')
+      else:
+        self.set_stance('d')
+
+      if self.mana < 10 and player.mana > 0:#if enemy has low mana and player has mana 
+        self.cast_spell(3, player)#cast mana drain
+
+      elif self.health > 100 and self.mana >= 10:
+        return self.cast_spell(1, player)
+
+      elif self.shield == 0 and self.mana >= 20:
+        self.cast_spell(2)
+
+      else:
+        return self.attack_enemy(player)
+
+      return False
+
+class God(Character):
+  def __init__(self, char_name, app):
+    Character.__init__(self, char_name, app)
+    self.max_health = 500;
+    self.max_mana = 200;
+    self.starting_potions = 3;
+    self.attack = 8;
+    self.defense = 4;
+    self.magic = 15;
+    self.resistance = 10;
+    self.health = self.max_health;
+    self.mana = self.max_mana;
+    self.potions = self.starting_potions;
+
+  def move(self, player):
+    move_complete = Character.move(self,player)
+    if not move_complete:
+      if self.health > 100:
+        self.set_stance('a')
+      elif self.health > 50:
+        self.set_stance('b')
+      else:
+        self.set_stance('d')
+
+      if self.mana < 10 and player.mana > 0:#if enemy has low mana and player has mana 
+        self.cast_spell(3, player)#cast mana drain
+
+      elif self.health > 100 and self.mana >= 10:
+        return self.cast_spell(1, player)
+
+      elif self.shield == 0 and self.mana >= 20:
+        self.cast_spell(2)
+
+      else:
+        return self.attack_enemy(player)
+
+      return False
+
+        
+  
 
