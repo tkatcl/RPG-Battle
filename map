@@ -59,6 +59,8 @@ class World:
             enemies = int((self.size**2)*0.08)            
         elif difficulty == 'l':
             enemies = int((self.size**2)*0.1)
+        elif difficulty == 'x':
+            enemies = int((self.size**2)*0.15)
 
         num_enemies = enemies    
 
@@ -168,7 +170,9 @@ class World:
         return encounter
 
     def move_enemies(self,difficulty):
-        if difficulty == 'l':
+        if difficulty == 'x':
+            ranged = self.size
+        elif difficulty == 'l':
             ranged = int(self.size*0.6)
         elif difficulty == 'h':
             ranged = int(self.size*0.5)
