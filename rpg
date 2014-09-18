@@ -181,6 +181,7 @@ def set_difficulty():
     app.write("m - Medium")
     app.write("h - Hard")
     app.write("l - Legendary")
+    app.write("x - EXTREME!")
     app.write("")
     app.wait_variable(app.inputVariable)#wait for input 
     difficulty = app.inputVariable.get()#input var
@@ -188,7 +189,7 @@ def set_difficulty():
     if difficulty == 'quit':
       app.quit()
 
-    if difficulty not in ['e','m','h','l'] or difficulty == '':
+    if difficulty not in ['e','m','h','l','x'] or difficulty == '':
       raise ValueError
 
   except ValueError: #exception handling
@@ -206,6 +207,8 @@ def create_enemies(mode, difficulty):
       enemies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]#dwarf,elf,human (hard)
     elif difficulty == 'l':
       enemies = [character.Human("Faramir", app), character.God("Jesus", app), character.Wizard("Gandalf", app)]#human,god,wizard (legendary)
+    elif difficulty == 'x':
+      enemies = [character.Elf("Jack", app), character.Dwarf("Shorty", app), character.Human("Sapien", app), character.Hobbit("Bilbo", app), character.Wizard("Jimmy", app), character.God("Steve", app), character.God("Mark",app)]      
     else:
       enemies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]#hobbit,hobbit (easy)
 
@@ -216,6 +219,8 @@ def create_enemies(mode, difficulty):
       enemies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
     elif difficulty == 'l':
       enemies = [character.Uruk("Lurtz", app), character.Wizard("Saruman", app), character.Devil("Satan", app)] #Devil,uruk,wizard (legendary)
+    elif difficulty == 'x':
+      enemies = [character.Goblin("Dobby", app), character.Orc("Bork", app), character.Uruk("Eric", app), character.Wizard("Oz", app), character.Devil("Kevin Rudd", app), character.Devil("Julia Gillard", app), character.Devil("Tony Abbott",app)]                 
     else:
       enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)
 
@@ -230,6 +235,8 @@ def create_allies(mode, difficulty):
       allies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
     elif difficulty == 'l':
       allies = [character.Devil("Monty", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #Devil,uruk,wizard (legendary)
+    elif difficulty == 'x':
+      allies = [character.Goblin("Dobby", app), character.Orc("Bork", app), character.Uruk("Eric", app), character.Wizard("Oz", app), character.Devil("Kevin Rudd"), character.Devil("Julia Gillard", app)]      
     else:
       allies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)    
 
@@ -240,6 +247,8 @@ def create_allies(mode, difficulty):
       allies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]#dwarf,elf,human (hard)
     elif difficulty == 'l':
       allies = [character.Human("Faramir", app), character.Human("Aragorn", app), character.Wizard("Gandalf", app)]#human,human,wizard (legendary)
+    elif difficulty == 'x':
+      allies = [character.Elf("Jack", app), character.Dwarf("Shorty", app), character.Human("Sapien", app), character.Hobbit("Bilbo", app), character.Wizard("Jimmy", app), character.God("Steve", app)]
     else:
       allies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]#hobbit,hobbit (easy)
 
@@ -322,8 +331,9 @@ elif difficulty == 'm':
   player_lives = int(num_enemies*0.6)
 elif difficulty == 'h':
   player_lives = int(num_enemies*0.45)
-elif difficulty == 'l':
+elif difficulty == 'l' or difficulty == 'x':
   player_lives = int(num_enemies * 0.3)
+
 
 alive = True
   
@@ -432,15 +442,12 @@ while True:
       game_map.populate_obstacles()
       num_enemies = game_map.populate_enemies(difficulty)
       if difficulty == 'e':
-        player_lives = int(num_enemies*1.5)
-
+        player_lives = int(num_enemies*0.75)
       elif difficulty == 'm':
-        player_lives = num_enemies
-
+        player_lives = int(num_enemies*0.6)
       elif difficulty == 'h':
-        player_lives = int(num_enemies*0.5)
-
-      elif difficulty == 'l':
-        player_lives = int(num_enemies * 0.25)
+        player_lives = int(num_enemies*0.45)
+      elif difficulty == 'l' or difficulty == 'x':
+        player_lives = int(num_enemies * 0.3)
 
       alive = True
