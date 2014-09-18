@@ -73,6 +73,7 @@ def set_race(mode):
       app.write("2. Orc")
       app.write("3. Uruk")
       app.write("4. Wizard")
+      app.write("5. Devil")
       app.write("")
       app.wait_variable(app.inputVariable)#enter input
       race = app.inputVariable.get()#input var
@@ -81,7 +82,7 @@ def set_race(mode):
         app.quit()
       
       race = int(race)
-      if race not in range(1,5):#check for 1 to 4
+      if race not in range(1,6):#check for 1 to 5
         raise ValueError
     
     except ValueError: #exception handling
@@ -101,6 +102,7 @@ def set_race(mode):
       app.write("3. Human")
       app.write("4. Hobbit")
       app.write("5. Wizard")
+      app.write("6. God")
       app.write("")
       app.wait_variable(app.inputVariable)#enter input
       race = app.inputVariable.get()#input var
@@ -110,7 +112,7 @@ def set_race(mode):
         
       race = int(race)
       
-      if race not in range(1,6):
+      if race not in range(1,7):
         raise ValueError
     
     except ValueError: #exception handling
@@ -146,25 +148,29 @@ def create_player(mode, race, char_name):
   # Evil
   if mode == 2:
     if race == 1:
-      player = character.Goblin(char_name, app)#instanciate goblin object from character fill as player
+      player = character.Goblin(char_name, app)#instanciate goblin object from character file as player
     elif race == 2:
-      player = character.Orc(char_name, app)#instanciate Orc object from character fill as player
+      player = character.Orc(char_name, app)#instanciate Orc object from character file as player
     elif race == 3:
-      player = character.Uruk(char_name, app)#instanciate Uruk object from character fill as player
+      player = character.Uruk(char_name, app)#instanciate Uruk object from character file as player
+    elif race == 4:
+      player = character.Wizard(char_name, app)#instanciate Wizard object from character file as player
     else:
-      player = character.Wizard(char_name, app)#instanciate Wizard object from character fill as player
+      player = character.Devil(char_name, app)#instanciate Devil object from character file as player
   # Good
   else:
     if race == 1:
-      player = character.Elf(char_name, app)#instanciate Elf object from character fill as player
+      player = character.Elf(char_name, app)#instanciate Elf object from character file as player
     elif race == 2:
-      player = character.Dwarf(char_name, app)#instanciate Dwarf object from character fill as player
+      player = character.Dwarf(char_name, app)#instanciate Dwarf object from character file as player
     elif race == 3:
-      player = character.Human(char_name, app)#instanciate Human object from character fill as player
+      player = character.Human(char_name, app)#instanciate Human object from character file as player
     elif race == 4:
-      player = character.Hobbit(char_name, app)#instanciate Hobbit object from character fill as player
+      player = character.Hobbit(char_name, app)#instanciate Hobbit object from character file as player
+    elif race == 5:
+      player = character.Wizard(char_name, app)#instanciate Wizard object from character file as player
     else:
-      player = character.Wizard(char_name, app)#instanciate Wizard object from character fill as player
+      player = character.God(char_name, app)#instanciate God object from character file as player
   return player #object player
 
 def set_difficulty():
@@ -199,7 +205,7 @@ def create_enemies(mode, difficulty):
     elif difficulty == 'h':
       enemies = [character.Dwarf("Gimli", app), character.Elf("Legolas", app), character.Human("Boromir", app)]#dwarf,elf,human (hard)
     elif difficulty == 'l':
-      enemies = [character.Human("Faramir", app), character.Human("Aragorn", app), character.Wizard("Gandalf", app)]#human,human,wizard (legendary)
+      enemies = [character.Human("Faramir", app), character.God("Jesus", app), character.Wizard("Gandalf", app)]#human,god,wizard (legendary)
     else:
       enemies = [character.Hobbit("Frodo", app), character.Hobbit("Sam", app)]#hobbit,hobbit (easy)
 
@@ -209,7 +215,7 @@ def create_enemies(mode, difficulty):
     elif difficulty == 'h':
       enemies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
     elif difficulty == 'l':
-      enemies = [character.Orc("Grishnakh", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #orc,uruk,wizard (legendary)
+      enemies = [character.Uruk("Lurtz", app), character.Wizard("Saruman", app), character.Devil("Satan", app)] #Devil,uruk,wizard (legendary)
     else:
       enemies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)
 
@@ -223,7 +229,7 @@ def create_allies(mode, difficulty):
     elif difficulty == 'h':
       allies = [character.Orc("Shagrat", app), character.Orc("Gorbag", app), character.Uruk("Lurtz", app)] #orc,orc,uru, (hard)
     elif difficulty == 'l':
-      allies = [character.Orc("Grishnakh", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #orc,uruk,wizard (legendary)
+      allies = [character.Devil("Monty", app), character.Uruk("Lurtz", app), character.Wizard("Saruman", app)] #Devil,uruk,wizard (legendary)
     else:
       allies = [character.Goblin("Azog", app), character.Goblin("Gorkil", app)] #goblin,goblin (easy)    
 
