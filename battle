@@ -41,14 +41,17 @@ class Battle:
       time.sleep(1)#pause
       
       # This is where the bulk of the battle takes place
-      self.do_player_actions()
-      self.do_allies_actions()
-      self.do_enemy_actions()
-      
+      flee = self.do_player_actions()
+      self.app.write(flee)
+      if flee != 'fled' and flee != 'died':
+        self.do_allies_actions()
+        self.do_enemy_actions()
+      else:
+        break
       # advance turn counter
       self.turn += 1
       
-    return (self.wins, self.kills)
+    return (self.wins, self.kills, flee)
 
   def get_action(self):
     """ Gets the player's chosen action for their turn """
@@ -57,6 +60,7 @@ class Battle:
       self.app.write("1. Attack Enemies")
       self.app.write("2. Cast Magic")
       self.app.write("3. Use Potion")
+      self.app.write("4. Flee")
       self.app.write("")
       self.app.wait_variable(self.app.inputVariable)
       player_action = self.app.inputVariable.get()
@@ -65,7 +69,7 @@ class Battle:
         self.app.quit()
 
       player_action = int(player_action)
-      if player_action not in range(1,4): #checks for 1 2 or 3
+      if player_action not in range(1,5): #checks for 1 2 or 3 or 4
         raise ValueError
 
     except ValueError:
@@ -157,6 +161,20 @@ class Battle:
     
     return stance_choice
 
+  def player_flee(self):
+    
+    succesfull = True
+    chance = random.randint(1,10)
+    if chance < 4:
+      succesfull = False
+      self.app.write("You were killed while fleeing the battle!")
+    else:
+      self.app.write("You have successfully fleed the battle!")
+
+    self.app.write("")
+      
+    return succesfull
+    
   def do_player_actions(self):
     """ Performs the player's actions """
   
@@ -172,7 +190,14 @@ class Battle:
 
       has_attacked = False
      
-      if player_action == 3: #uses potion
+      if player_action == 4:
+        succesfull = self.player_flee()
+        if succesfull:
+          return 'fled'
+        else:
+          return 'died'
+
+      elif player_action == 3: #uses potion
         has_attacked = self.player.use_potion() #returns true or false
     
       elif player_action == 2: #uses spell
