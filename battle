@@ -60,7 +60,8 @@ class Battle:
       self.app.write("2. Cast Magic")
       self.app.write("3. Use Potion")
       self.app.write("4. Flee")
-      self.app.write("5. Special ability")
+      self.app.write("5. Special ability (Do not select this, it is not complete and will quit the game)")
+      self.app.write("6. Use Elixer")
       self.app.write("")
       self.app.wait_variable(self.app.inputVariable)
       player_action = self.app.inputVariable.get()
@@ -69,7 +70,7 @@ class Battle:
         self.app.quit()
 
       player_action = int(player_action)
-      if player_action not in range(1,5): #checks for 1 2 or 3 or 4
+      if player_action not in range(1,7): #checks for 1 2 or 3 or 4
         raise ValueError
 
     except ValueError:
@@ -190,7 +191,13 @@ class Battle:
 
       has_attacked = False
      
-      if player_action == 4:
+      if player_action == 6:
+        has_attacked = self.player.use_elixer()
+
+      elif player_action == 5:
+        self.app.quit()
+
+      elif player_action == 4:
         succesfull = self.player_flee()
         if succesfull:
           return 'fled'
@@ -249,8 +256,7 @@ class Battle:
         if enemy.health > 0 and not self.player_lost:
           if not self.player_lost:
             chosen = False
-            induced = [1,2,3,4]
-            if random.choice(induced) == 1:
+            if random.randint(1,4) == 1:
               target = self.player
             else:
               while chosen == False:
