@@ -27,6 +27,17 @@ class Character:
     self.shield = 0
     self.max_shield = 75
     self.app = app
+    
+    self.player_starting_xp = 0
+    self.player_xp = self.player_starting_xp
+
+    self.player_starting_mana_ability = False
+    self.player_starting_shield_ability = False
+    self.player_starting_fire_ability = False
+
+    self.player_mana_ability = self.player_starting_mana_ability
+    self.player_shield_ability = self.player_starting_shield_ability
+    self.player_fire_ability = self.player_starting_fire_ability
 
   def __str__(self):
     """ string representation of character """
@@ -88,15 +99,12 @@ class Character:
       target.attack_enemy(self)
       time.sleep(1)
 
-    elif kill:
+    if kill:
       self.app.write(self.name + " has killed " + target.name + ".") #prints character has killed enemy
       self.app.write("")
       time.sleep(1)
       return True      
     else:
-      self.app.write("Counter attack unsuccessful")
-      self.app.write("")
-      time.sleep(1)
       return False
 
   def defend_attack(self, att_damage):
@@ -171,12 +179,12 @@ class Character:
     race = self.__class__.__name__
     #checks if player has enough mana to use spell
     if choice == 1:
-      if race == "Wizard" and self.mana >= 10:
+      if race == "Wizard" or race == "Devil" or race == "God" and self.mana >= 10 and self.player_fire_ability == True:
         valid = True
-    elif choice == 2 and self.mana >= 20:
+    elif choice == 2 and self.mana >= 20 and self.player_shield_ability == True:
       valid = True
     elif choice == 3:
-      if race == "Wizard":
+      if race == "Wizard" or race == "Devil" or race == "God" and self.player_mana_ability == True:
         valid = True
         
     return valid
@@ -336,6 +344,13 @@ class Character:
     self.mana = self.max_mana;
     self.potions = self.starting_potions;
     self.shield = 0
+
+    self.player_starting_xp = 0
+    self.player_xp = self.player_starting_xp
+
+    self.player_mana_ability = self.player_starting_mana_ability
+    self.player_shield_ability = self.player_starting_shield_ability
+    self.player_fire_ability = self.player_starting_fire_ability
     
   def print_status(self):
     ''' Prints the current status of the character '''
