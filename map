@@ -28,19 +28,21 @@ class World:
         self.player_starting_xp = 0
         self.player_xp = self.player_starting_xp
 
-        self.player_starting_money = 500
+        self.player_starting_money = 5000
         self.player_money = self.player_starting_money
 
         self.player_starting_mana_ability = False
         self.player_starting_shield_ability = False
         self.player_starting_fire_ability = False
+        self.player_starting_nuke_ability = False
 
         self.player_mana_ability = self.player_starting_mana_ability
         self.player_shield_ability = self.player_starting_shield_ability
         self.player_fire_ability = self.player_starting_fire_ability
+        self.player_nuke_ability = self.player_starting_nuke_ability
 
-        self.merchant_store = [self.player_mana_ability, self.player_shield_ability, self.player_fire_ability, self.user_player.potions, self.user_player.elixers]
-        self.store_items = ["mana_ability - $75", "shield_ability - $75", "fire_ability - $150", "healing_potion - 50", "mana_potion - 25"]   
+        self.merchant_store = [self.player_nuke_ability, self.player_mana_ability, self.player_shield_ability, self.player_fire_ability, self.user_player.potions, self.user_player.elixers]
+        self.store_items = ["nuke_ability - 1500","mana_ability - $75", "shield_ability - $75", "fire_ability - $150", "healing_potion - 50", "mana_potion - 25"]   
         
         self.dead_enemy_locations = []
 
@@ -353,20 +355,22 @@ class World:
         if purchase == 'quit':
             self.app.quit()
             
-        if purchase not in [0,1,2,3,4]:
-            self.app.write("Hello mutha fuka")
+        if purchase not in [0,1,2,3,4,5]:
             valid = False
-            
-        if purchase == 0 or purchase == 1:
+
+        if purchase == 0:
+            if self.player_money < 1500:
+                valid = False            
+        if purchase == 1 or purchase == 2:
             if self.player_money < 75:
                 valid = False
-        if purchase == 2:
+        if purchase == 3:
             if self.player_money < 150:
                 valid = False
-        if purchase == 3:
+        if purchase == 4:
             if self.player_money < 50:
                 valid = False                
-        if purchase == 4:
+        if purchase == 5:
             if self.player_money < 25:
                 valid = False
                 
@@ -394,25 +398,30 @@ class World:
 
             if self.valid_purchase(purchase):
                 if purchase == 0:
+                    self.player_money -= 1500
+                    self.player_nuke_ability = True
+                    self.user_player.player_nuke_ability = True
+                    self.app.write("DEAR GOD YOU HAVE THE POWER OF DOOM!!!!!")
+                if purchase == 1:
                     self.player_money -= 75
                     self.player_mana_ability = True
                     self.user_player.player_mana_ability = True
                     self.app.write("You have purchased the: mana ability")
-                elif purchase == 1:
+                elif purchase == 2:
                     self.player_money -= 75
                     self.player_shield_ability = True
                     self.user_player.player_shield_ability = True
                     self.app.write("You have purchased the: shield ability")
-                elif purchase == 2:
+                elif purchase == 3:
                     self.player_money -= 150
                     self.player_fire_ability = True
                     self.user_player.player_fire_ability = True
                     self.app.write("You have purchased the: fire ability")
-                elif purchase == 3:
+                elif purchase == 4:
                     self.player_money -= 50
                     self.user_player.potions += 1
                     self.app.write("You have purchased a healing potion")
-                elif purchase == 4:
+                elif purchase == 5:
                     self.player_money -= 25
                     self.user_player.potions += 1
                     self.app.write("You have purchased an elixer potion")
