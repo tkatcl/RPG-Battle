@@ -321,8 +321,9 @@ allies = create_allies(mode, difficulty)
 
 time.sleep(1)
 
-game_map = world.World(10,app)#has to be size 10 or greater
+game_map = world.World(10,player,app)#has to be size 10 or greater
 game_map.populate_obstacles()
+game_map.populate_money()
 num_enemies = game_map.populate_enemies(difficulty)
 
 if difficulty == 'e':
@@ -466,6 +467,7 @@ while True:
 
       game_map.reset_map()
       game_map.populate_obstacles()
+      game_map.populate_money()
       num_enemies = game_map.populate_enemies(difficulty)
       if difficulty == 'e':
         player_lives = int(num_enemies*0.75)
