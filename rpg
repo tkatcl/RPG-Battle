@@ -277,7 +277,7 @@ def quit_game():
 
 def print_results():
   """displays statistics"""
-  app.write("Game Over!")
+  app.write("Battle Over!")
   app.write("No. Battles: {0}".format(str(battles)))
   app.write("No. Wins: {0}".format(wins))
   app.write("No. Kills: {0}".format(kills))
@@ -321,7 +321,7 @@ allies = create_allies(mode, difficulty)
 
 time.sleep(1)
 
-game_map = world.World(10,0,0,9,9,app)#has to be size 10 or greater
+game_map = world.World(10,app)#has to be size 10 or greater
 game_map.populate_obstacles()
 num_enemies = game_map.populate_enemies(difficulty)
 
@@ -355,6 +355,10 @@ while True:
         finished = True
         moving = False
 
+    if game_map.xlocation == game_map.merchant_xloc and game_map.ylocation == game_map.merchant_yloc:
+      game_map.meet_merchant()
+      game_map.buy_merchant()
+
     if moving == True and finished == False:
       app.write(game_map)
       time.sleep(1)
@@ -370,8 +374,8 @@ while True:
       
     time.sleep(5)
 
-    encounter = battle.Battle(player, enemies, allies, app) #instanciate battle from battle file
-    battle_wins, battle_kills, flee = encounter.play() #play method returns win or loose and number of kills
+    encounter = battle.Battle(player, enemies, allies, game_map.player_xp, app) #instanciate battle from battle file
+    battle_wins, battle_kills, flee, earned_experience = encounter.play() #play method returns win or loose and number of kills
 
     if flee == 'fled':
       game_map.after_battle(direction,battle_wins)
@@ -385,6 +389,28 @@ while True:
       game_map.after_battle(direction,battle_wins)
     else:
       game_map.after_battle(direction,battle_wins)
+      battle_reward = random.randint(1,10)
+      app.write("You have collected: $" + str(battle_reward) + " as a battle_reward")
+      game_map.player_money += battle_reward
+      game_map.player_xp += earned_experience
+      
+      if player.player_xp < 100 and player.player_xp + earned_experience > 100:
+        app.write("LEVEL UP: You have unlocked the mana ability!!!")
+        game_map.player_mana_ability = True
+        player.player_mana_ability = True
+
+      if player.player_xp < 150 and player.player_xp + earned_experience > 150:
+        app.write("LEVEL UP: You have unlcoked the shield ability!!!")
+        game_map.player_shield_ability = True
+        player.player_shield_ability = True
+
+      if player.player_xp < 250 and player.player_xp + earned_experience > 250:
+        app.write("LEVEL UP: You have unlcoked the fire ability!!!")
+        game_map.player_fire_ability = True
+        player.player_fire_ability = True
+        
+      player.player_xp += earned_experience
+      game_map.player_xp += earned_experience
       
     battles += 1
     wins += battle_wins
