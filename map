@@ -4,7 +4,7 @@ import gui
 
 class World:
 
-    def __init__(self, size, app):
+    def __init__(self, size,user_player, app):
         self.size = size 
         
         self.world = [x[:] for x in [['.']*size]*size]
@@ -23,11 +23,12 @@ class World:
         self.merchant = '⚚'
         self.money = '$'
         self.app = app
+        self.user_player = user_player
 
         self.player_starting_xp = 0
         self.player_xp = self.player_starting_xp
 
-        self.player_starting_money = 50
+        self.player_starting_money = 500
         self.player_money = self.player_starting_money
 
         self.player_starting_mana_ability = False
@@ -38,8 +39,8 @@ class World:
         self.player_shield_ability = self.player_starting_shield_ability
         self.player_fire_ability = self.player_starting_fire_ability
 
-        self.merchant_store = [self.player_mana_ability, self.player_shield_ability, self.player_fire_ability]
-        self.store_items = ["mana_ability - $75", "shield_ability - $75", "fire_ability - $150"]   
+        self.merchant_store = [self.player_mana_ability, self.player_shield_ability, self.player_fire_ability, self.user_player.potions, self.user_player.elixers]
+        self.store_items = ["mana_ability - $75", "shield_ability - $75", "fire_ability - $150", "healing_potion - 50", "mana_potion - 25"]   
         
         self.dead_enemy_locations = []
 
@@ -98,7 +99,19 @@ class World:
                     self.world[yen][xen] = self.enemies
                     enemies-=1
         return num_enemies    
-            
+
+    def populate_money(self):
+        money = (self.size**2)*0.1
+        choices = [num for num in range(1,self.size-1)]
+        for x in range(int(money)):
+            while True:
+                obx = random.choice(choices)
+                oby = random.choice(choices)
+                if self.world[oby][obx] == '.':
+                    if self.world[oby+1][obx] == '.' and self.world[oby-1][obx] == '.':
+                        if self.world[oby][obx+1] == '.' and self.world[oby][obx-1] == '.':          
+                            self.world[oby][obx] = self.money
+                            break
 
     def invalid_direction(self,direction):
         invalid = True       
@@ -167,6 +180,8 @@ class World:
             self.app.write("")
             if self.world[self.ylocation][self.xlocation] ==  self.enemies:
                 encounter = True
+            elif self.world[self.ylocation][self.xlocation] == self.money:
+                self.player_money += 5                
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'u':
             self.ylocation -= 1
@@ -175,6 +190,8 @@ class World:
             self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
+            elif self.world[self.ylocation][self.xlocation] == self.money:
+                self.player_money += 5     
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'l':
             self.xlocation -= 1
@@ -183,6 +200,8 @@ class World:
             self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
+            elif self.world[self.ylocation][self.xlocation] == self.money:
+                self.player_money += 5     
             self.world[self.ylocation][self.xlocation] = self.player
         elif direction == 'r':
             self.xlocation += 1
@@ -191,6 +210,8 @@ class World:
             self.app.write("")
             if self.world[self.ylocation][self.xlocation] == self.enemies:
                 encounter = True
+            elif self.world[self.ylocation][self.xlocation] == self.money:
+                self.player_money += 5     
             self.world[self.ylocation][self.xlocation] = self.player
         time.sleep(0.5)
         return encounter
@@ -328,61 +349,85 @@ class World:
 
     def valid_purchase(self,purchase):
         valid = True
+        
         if purchase == 'quit':
             self.app.quit()
-
-        if purchase not in [0,1,2]:
+            
+        if purchase not in [0,1,2,3,4]:
+            self.app.write("Hello mutha fuka")
             valid = False
-
+            
         if purchase == 0 or purchase == 1:
             if self.player_money < 75:
                 valid = False
-        elif purchase == 2:
+        if purchase == 2:
             if self.player_money < 150:
+                valid = False
+        if purchase == 3:
+            if self.player_money < 50:
+                valid = False                
+        if purchase == 4:
+            if self.player_money < 25:
                 valid = False
                 
         return valid
 
     def buy_merchant(self):
         self.app.write("Player money: $" + str(self.player_money))
-        if self.player_money >= 75:
+        if self.player_money >= 25:
             self.app.write("Items available:")
-            for item in range(len(self.merchant_store)-1):
-                if self.merchant_store[item] == False:
-                    
-                    self.app.write(str(item)+'. - '+self.store_items[item])
-                else:
-                    self.app.write(str(item)+" Ability already aquired!")
-            app.write("")
-            
-            app.wait_variable(app.inputVariable)#wait for input 
-            purchase = app.inputVariable.get()
+            for item in range(len(self.merchant_store)):
+                if item < 3:
+                    if self.merchant_store[item] == False:
+                        
+                        self.app.write(str(item)+'. - '+self.store_items[item])
+                    else:
+                        self.app.write(str(item)+" Ability already aquired!")
 
-            if valid_purchase(purchase):
+                else:
+                    self.app.write(str(item) +'. - '+self.store_items[item])
+                self.app.write("")
+            
+            self.app.wait_variable(self.app.inputVariable)#wait for input 
+            purchase = self.app.inputVariable.get()
+            purchase = int(purchase)
+
+            if self.valid_purchase(purchase):
                 if purchase == 0:
                     self.player_money -= 75
                     self.player_mana_ability = True
+                    self.user_player.player_mana_ability = True
                     self.app.write("You have purchased the: mana ability")
-                if purchase == 1:
+                elif purchase == 1:
                     self.player_money -= 75
                     self.player_shield_ability = True
+                    self.user_player.player_shield_ability = True
                     self.app.write("You have purchased the: shield ability")
                 elif purchase == 2:
                     self.player_money -= 150
                     self.player_fire_ability = True
+                    self.user_player.player_fire_ability = True
                     self.app.write("You have purchased the: fire ability")
+                elif purchase == 3:
+                    self.player_money -= 50
+                    self.user_player.potions += 1
+                    self.app.write("You have purchased a healing potion")
+                elif purchase == 4:
+                    self.player_money -= 25
+                    self.user_player.potions += 1
+                    self.app.write("You have purchased an elixer potion")
 
                 self.app.write("")
                 self.app.write("Your current balance: $"+str(self.player_money))
                 time.sleep(1)
                 self.app.write("Thankyou for shopping at Harry's supply store")
                 self.app.write("Would you like to buy anything else? (y/n)")
-                app.wait_variable(app.inputVariable)
-                decision = app.inputVariable.get()
-                while decision != 'y' or decision != 'n':
+                self.app.wait_variable(self.app.inputVariable)
+                decision = self.app.inputVariable.get()
+                while decision != 'y' and decision != 'n':
                     self.app.write("Invalid input")
-                    app.wait_variable(app.inputVariable)
-                    decision = app.inputVariable.get()
+                    self.app.wait_variable(self.app.inputVariable)
+                    decision = self.app.inputVariable.get()
                     
                 if decision == 'y':
                     self.buy_merchant()
@@ -396,8 +441,8 @@ class World:
         else:
             self.app.write("Your cash balance is too low!")
             time.sleep(1)
-            self.app.write("I only do business if you have money!" + '\n')
-            time.sleep(2)
+            self.app.write("If you ain't talking money I ain't talking at all!" + '\n')
+            time.sleep(3)
            
             
 
