@@ -4,34 +4,57 @@ import gui
 
 class World:
 
-    def __init__(self, size, xstart, ystart, xend, yend, app):
+    def __init__(self, size, app):
         self.size = size 
         
         self.world = [x[:] for x in [['.']*size]*size]
         
-        self.xstart = xstart
-        self.ystart = ystart
+        self.xstart = 0
+        self.ystart = 0
         
-        self.xend = xend
-        self.yend = yend
+        self.xend = self.size - 1
+        self.yend = self.size - 1
         
         self.player = '☺'
         self.finish = '⚐'
         self.obstacle = '#'
         self.enemies = '⚔'
         self.skull = '☠'
+        self.merchant = '⚚'
+        self.money = '$'
         self.app = app
 
+        self.player_starting_xp = 0
+        self.player_xp = self.player_starting_xp
+
+        self.player_starting_money = 50
+        self.player_money = self.player_starting_money
+
+        self.player_starting_mana_ability = False
+        self.player_starting_shield_ability = False
+        self.player_starting_fire_ability = False
+
+        self.player_mana_ability = self.player_starting_mana_ability
+        self.player_shield_ability = self.player_starting_shield_ability
+        self.player_fire_ability = self.player_starting_fire_ability
+
+        self.merchant_store = [self.player_mana_ability, self.player_shield_ability, self.player_fire_ability]
+        self.store_items = ["mana_ability - $75", "shield_ability - $75", "fire_ability - $150"]   
+        
         self.dead_enemy_locations = []
+
+        self.merchant_xloc = int(self.size/2)
+        self.merchant_yloc = int(self.size/2)
         
         self.xlocation = self.xstart
         self.ylocation = self.ystart
         
         self.world[self.ylocation][self.xlocation] = self.player
         self.world[self.yend][self.xend] = self.finish
+        self.world[self.merchant_yloc][self.merchant_xloc] = self.merchant
 
     def __str__(self):
-        display = ''
+        display = "XP: " + str(self.player_xp) + "       " + "Money: $" + str(self.player_money) + '\n'
         for row in self.world:
             display += str(' '.join(row)) + '\n'
         display.rstrip()
@@ -130,6 +153,9 @@ class World:
 
         elif [self.ylocation,self.xlocation] in self.dead_enemy_locations:
             self.world[self.ylocation][self.xlocation] = self.skull
+
+        elif self.ylocation == self.merchant_yloc and self.xlocation == self.merchant_xloc:
+            self.world[self.ylocation][self.xlocation] = self.merchant
         
         else:
             self.world[self.ylocation][self.xlocation] = '.'
@@ -255,6 +281,13 @@ class World:
 
         self.dead_enemy_location = []
 
+        self.player_money = self.player_starting_money
+        self.player_xp = self.player_starting_mana
+
+        self.player_mana_ability = self.player_starting_mana_ability
+        self.player_shield_ability = self.player_starting_shield_ability
+        self.player_fire_ability = self.player_starting_fire_ability
+
     def check_for_enemies(self):
         alive_enemies = False
         for row in self.world:
@@ -284,7 +317,87 @@ class World:
 
         self.world[self.ylocation][self.xlocation] = self.player
 
-        
+    def meet_merchant(self):
+        self.app.write("Welcome to Harry's supplies store" + '\n')
+        time.sleep(1)
+        self.app.write("Are you tired of waiting for your xp to grow?" + '\n')
+        time.sleep(1)
+        self.app.write("Well you're in luck, at Harry's store you can buy spells and potions without having to risk your precious lives" + '\n')
+        time.sleep(1)
+        self.app.write("What would you like to buy?" + '\n')
+
+    def valid_purchase(self,purchase):
+        valid = True
+        if purchase == 'quit':
+            self.app.quit()
+
+        if purchase not in [0,1,2]:
+            valid = False
+
+        if purchase == 0 or purchase == 1:
+            if self.player_money < 75:
+                valid = False
+        elif purchase == 2:
+            if self.player_money < 150:
+                valid = False
+                
+        return valid
+
+    def buy_merchant(self):
+        self.app.write("Player money: $" + str(self.player_money))
+        if self.player_money >= 75:
+            self.app.write("Items available:")
+            for item in range(len(self.merchant_store)-1):
+                if self.merchant_store[item] == False:
+                    
+                    self.app.write(str(item)+'. - '+self.store_items[item])
+                else:
+                    self.app.write(str(item)+" Ability already aquired!")
+            app.write("")
+            
+            app.wait_variable(app.inputVariable)#wait for input 
+            purchase = app.inputVariable.get()
+
+            if valid_purchase(purchase):
+                if purchase == 0:
+                    self.player_money -= 75
+                    self.player_mana_ability = True
+                    self.app.write("You have purchased the: mana ability")
+                if purchase == 1:
+                    self.player_money -= 75
+                    self.player_shield_ability = True
+                    self.app.write("You have purchased the: shield ability")
+                elif purchase == 2:
+                    self.player_money -= 150
+                    self.player_fire_ability = True
+                    self.app.write("You have purchased the: fire ability")
+
+                self.app.write("")
+                self.app.write("Your current balance: $"+str(self.player_money))
+                time.sleep(1)
+                self.app.write("Thankyou for shopping at Harry's supply store")
+                self.app.write("Would you like to buy anything else? (y/n)")
+                app.wait_variable(app.inputVariable)
+                decision = app.inputVariable.get()
+                while decision != 'y' or decision != 'n':
+                    self.app.write("Invalid input")
+                    app.wait_variable(app.inputVariable)
+                    decision = app.inputVariable.get()
+                    
+                if decision == 'y':
+                    self.buy_merchant()
+
+                else:
+                    self.app.write("Goodbye and goodluck out there!" + '\n')
+                    time.sleep(2)          
+            else:
+                self.app.write("Invalid purchase" + '\n')
+                self.buy_merchant()
+        else:
+            self.app.write("Your cash balance is too low!")
+            time.sleep(1)
+            self.app.write("I only do business if you have money!" + '\n')
+            time.sleep(2)
            
             
 
