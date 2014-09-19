@@ -34,10 +34,12 @@ class Character:
     self.player_starting_mana_ability = False
     self.player_starting_shield_ability = False
     self.player_starting_fire_ability = False
+    self.player_starting_nuke_ability = False
 
     self.player_mana_ability = self.player_starting_mana_ability
     self.player_shield_ability = self.player_starting_shield_ability
     self.player_fire_ability = self.player_starting_fire_ability
+    self.player_nuke_ability = self.player_starting_nuke_ability
 
   def __str__(self):
     """ string representation of character """
@@ -186,7 +188,10 @@ class Character:
     elif choice == 3:
       if race == "Wizard" or race == "Devil" or race == "God" and self.player_mana_ability == True:
         valid = True
-        
+    elif choice == 4:
+      if self.mana >= 50 and self.player_nuke_ability == True:
+        valid = True
+              
     return valid
 
   def cast_spell(self, choice, target=False): #target is false if not target
@@ -201,6 +206,8 @@ class Character:
       self.cast_shield()
     elif choice == 3:#cast mana drain
       self.cast_mana_drain(target)
+    elif choice == 4:
+      self.fire_nuke(target)
     else:#if character is not capable of using specific magic
       self.app.write("Invalid spell choice. Spell failed!")
       self.app.write("")
@@ -278,8 +285,45 @@ class Character:
       self.app.write(target.name + " has " + str(target.mana) + " mana left")
     self.app.write("")
 
-    def special_ability(self,mana,target):
-      pass
+  def special_ability(self,mana,target):
+    pass
+
+  def fire_nuke(self, target):  
+    self.mana -= 50
+    self.app.write(self.name + " send " + target.name + " to his doom!")#prints you attack enemy with nuke
+    time.sleep(1)
+      
+    damage = 1000
+      
+    if target.shield > 0: #takes away shield health first
+      if damage <= target.shield: #if damage wipes partial sheild health
+        self.app.write(target.name + "'s shield absorbs " + str(damage) + " damage.")
+        time.sleep(1)
+        target.shield = target.shield - damage #removes shield health
+        damage = 0
+      elif damage != 0: # if damage is greater than target shield
+        self.app.write(target.name + "'s shield absorbs " + str(target.shield) + " damage.")
+        time.sleep(1)
+        damage = damage - target.shield #removes damage that is absorbed by shield
+        target.shield = 0 #wipes all shield health
+                        
+    self.app.write(target.name + " takes " + str(damage) + " damage.")
+    self.app.write("")
+    time.sleep(1)
+    target.health = target.health - damage #remain damage inflicted on enemy
+      
+    if target.health <= 0: #if target dies
+      target.health = 0
+      self.app.write(target.name + " is dead!")
+      self.app.write("")
+      time.sleep(1)
+      return True
+
+    else: #prints how much life remains
+      self.app.write(target.name + " has " + str(target.health) + " hit points left")
+      self.app.write("")
+      time.sleep(1)
+      return False
 
 #### Character Item Actions ####
 
