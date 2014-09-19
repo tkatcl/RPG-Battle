@@ -13,7 +13,7 @@ import random
 
 class Battle:
 
-  def __init__(self, player, enemies, allies, app):
+  def __init__(self, player, enemies, allies, player_experience, app):
     """
     Instantiates a battle object between the players and enemies specified,
     sending output to the given gui instance
@@ -27,6 +27,8 @@ class Battle:
     self.kills = 0
     self.player_won = False
     self.player_lost = False
+    self.player_experience = player_experience     
+    self.experienced_earned = 0
   
   def play(self):
     """
@@ -49,8 +51,9 @@ class Battle:
         break
       # advance turn counter
       self.turn += 1
+      self.experienced_earned += 10
       
-    return (self.wins, self.kills, flee)
+    return (self.wins, self.kills, flee, self.experienced_earned)
 
   def get_action(self):
     """ Gets the player's chosen action for their turn """
@@ -86,11 +89,11 @@ class Battle:
 
     try:
       self.app.write("Select your spell:")
-      if player_race == "Wizard" and self.player.mana >= 10:
+      if player_race == "Wizard" or player_race == "Devil" or player_race == "God" and self.player.mana >= 10 and self.player.player_fire_ability == True:
         self.app.write("1. Fireball (10 mp)")
-      if self.player.mana >= 20:
+      if self.player.mana >= 20 and self.player.player_shield_ability == True:
         self.app.write("2. Shield (20 mp)")
-      if player_race == "Wizard":
+      if player_race == "Wizard" or player_race == "Devil" or player_race == "God" and self.player.player_mana_ability == True:
         self.app.write("3. Mana Drain (no mp cost)")
       self.app.write("0. Cancel Spell")
       self.app.write("")
@@ -208,7 +211,7 @@ class Battle:
         has_attacked = self.player.use_potion() #returns true or false
     
       elif player_action == 2: #uses spell
-        spell_choice = self.select_spell() #returns 1 (fireball) 2 (shield) 3 (mana drain)
+        spell_choice = self.select_spell() #returns 0 (cancel spell) 1 (fireball) 2 (shield) 3 (mana drain)
 
         if spell_choice != 0: #if spell choice is 0 than has attacked remains False
           has_attacked = True #end move variable
@@ -216,6 +219,8 @@ class Battle:
             target = self.choose_target()#returns number that is index of enemy in enemy list
             if self.player.cast_spell(spell_choice, self.enemies[target]): #returns true if character kills enemy (using fireball)
               self.kills += 1
+              self.experienced_earned += 20
+              
           else:
             self.player.cast_spell(spell_choice) #cast spell line 171 in character file
          
@@ -225,6 +230,7 @@ class Battle:
 
         if self.player.attack_enemy(self.enemies[target]):#returns true or false if enemy dies
           self.kills += 1
+          self.experienced_earned += 15
     
       turn_over = True #variable that ends turn
       if not has_attacked: #if player has not made valid move
@@ -299,10 +305,10 @@ class Battle:
                 self.player_won = False
                 break
 
-    if self.player_won == True: #if player wins the game
-        self.app.write("Your enemies have been vanquished by your allies!!")
-        self.app.write("")
-        time.sleep(1)
-        self.wins += 1
+      if self.player_won == True: #if player wins the game
+          self.app.write("Your enemies have been vanquished by your allies!!")
+          self.app.write("")
+          time.sleep(1)
+          self.wins += 1
           
           
