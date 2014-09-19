@@ -63,7 +63,7 @@ class Battle:
       self.app.write("2. Cast Magic")
       self.app.write("3. Use Potion")
       self.app.write("4. Flee")
-      self.app.write("5. Special ability (Do not select this, it is not complete and will quit the game)")
+      self.app.write("5. Unique ability (Do not select this, it is not complete and will quit the game)")
       self.app.write("6. Use Elixer")
       self.app.write("")
       self.app.wait_variable(self.app.inputVariable)
@@ -95,6 +95,8 @@ class Battle:
         self.app.write("2. Shield (20 mp)")
       if player_race == "Wizard" or player_race == "Devil" or player_race == "God" and self.player.player_mana_ability == True:
         self.app.write("3. Mana Drain (no mp cost)")
+      if self.player.mana >= 50 and self.player.player_nuke_ability == True:
+        self.app.write("4. Nuke")
       self.app.write("0. Cancel Spell")
       self.app.write("")
       self.app.wait_variable(self.app.inputVariable)#take user input
@@ -215,7 +217,7 @@ class Battle:
 
         if spell_choice != 0: #if spell choice is 0 than has attacked remains False
           has_attacked = True #end move variable
-          if spell_choice == 1 or spell_choice == 3: #checks for attacking spell
+          if spell_choice == 1 or spell_choice == 3 or spell_choice == 4: #checks for attacking spell
             target = self.choose_target()#returns number that is index of enemy in enemy list
             if self.player.cast_spell(spell_choice, self.enemies[target]): #returns true if character kills enemy (using fireball)
               self.kills += 1
