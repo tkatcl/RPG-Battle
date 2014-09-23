@@ -343,10 +343,20 @@ while True:
   moving = True
   finished = False
   alive_enemies = True #check if enemies are still alive
+  moves_before_money_scramble = 0
   
   print_lives(player_lives)
-
+  #while player hasn't encountered enemies and died
   while alive and moving:
+    
+    if moves_before_money_scramble == 2:
+      app.write(3*'\n')
+      app.write("Scrambling Money locations")
+      game_map.clear_money()
+      game_map.populate_money()
+      app.write(3*'\n')
+      moves_before_money_scramble = 0
+      
     app.write(game_map)
     direction = game_map.get_direction()
     if game_map.move_player(direction):
@@ -364,7 +374,8 @@ while True:
       app.write(game_map)
       time.sleep(1)
       if game_map.move_enemies(difficulty):
-        moving = False    
+        moving = False
+    moves_before_money_scramble += 1
 
   if finished == False:    
     for x in range(20):
@@ -377,11 +388,11 @@ while True:
 
     encounter = battle.Battle(player, enemies, allies, game_map.player_xp, app) #instanciate battle from battle file
     battle_wins, battle_kills, flee, earned_experience = encounter.play() #play method returns win or loose and number of kills
-
-    if flee == 'fled':
+    
+    if flee == 'fled':#test if flee alive
       game_map.after_battle(direction,battle_wins)
 
-    elif flee == 'died':
+    elif flee == 'died':#test if killed while fleeing
       player_lives -= 1
       game_map.after_battle(direction,battle_wins)                            
 
@@ -399,16 +410,25 @@ while True:
         app.write("LEVEL UP: You have unlocked the mana ability!!!")
         game_map.player_mana_ability = True
         player.player_mana_ability = True
+        game_map.merchant_store[1] = True
 
       if player.player_xp < 150 and player.player_xp + earned_experience > 150:
         app.write("LEVEL UP: You have unlcoked the shield ability!!!")
         game_map.player_shield_ability = True
         player.player_shield_ability = True
+        game_map.merchant_store[2] = True
 
       if player.player_xp < 250 and player.player_xp + earned_experience > 250:
         app.write("LEVEL UP: You have unlcoked the fire ability!!!")
         game_map.player_fire_ability = True
         player.player_fire_ability = True
+        game_map.merchant_store[3] = True
+
+      if player.player_xp < 1000 and player.player_xp + earned_experience > 1000:
+        app.write("LEVEL UP: You have unlcoked the nuke ability!!!")
+        game_map.player_nuke_ability = True
+        player.player_nuke_ability = True
+        game_map.merchant_store[0] = True
         
       player.player_xp += earned_experience
       game_map.player_xp += earned_experience
@@ -447,7 +467,7 @@ while True:
       app.quit()
 
     else:
-      # Playing again - reset all enemies and players
+      # Playing again - reset all enemies and players and map and spells
       player.reset()
       for enemy in enemies:
         enemy.reset()
@@ -464,7 +484,7 @@ while True:
       difficulty = set_difficulty()#returns str of difficulty
       enemies = create_enemies(mode, difficulty)#returns list of enemy objects
       time.sleep(1)
-
+  
       game_map.reset_map()
       game_map.populate_obstacles()
       game_map.populate_money()
@@ -477,5 +497,4 @@ while True:
         player_lives = int(num_enemies*0.45)
       elif difficulty == 'l' or difficulty == 'x':
         player_lives = int(num_enemies * 0.3)
-
       alive = True
