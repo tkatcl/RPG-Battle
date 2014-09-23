@@ -44,7 +44,7 @@ class Battle:
       
       # This is where the bulk of the battle takes place
       flee = self.do_player_actions()
-      if flee != 'fled' and flee != 'died':
+      if flee != 'fled' and flee != 'died':#check if player has not fleed or died while fleeing
         self.do_allies_actions()
         self.do_enemy_actions()
       else:
@@ -168,7 +168,7 @@ class Battle:
     return stance_choice
 
   def player_flee(self):
-    
+    """flee method for player"""
     succesfull = True
     chance = random.randint(1,10)
     if chance < 4:
@@ -286,6 +286,7 @@ class Battle:
         time.sleep(1)
 
   def do_allies_actions(self):
+    """allies of the game help assist character in killing enemies"""
     allies_choices = self.enemies
 
     if not self.player_won:
