@@ -125,7 +125,7 @@ class Character:
       self.app.write(self.name + " successfully blocks the attack!")
       block = att_damage #blocks all damage
       time.sleep(1)
-      counter_chance = random.randint(1,2)
+      counter_chance = random.randint(1,2)#50% chance of counter attack
       if counter_chance == 1:
         counter = True
 
@@ -395,6 +395,7 @@ class Character:
     self.player_mana_ability = self.player_starting_mana_ability
     self.player_shield_ability = self.player_starting_shield_ability
     self.player_fire_ability = self.player_starting_fire_ability
+    self.player_nuke_ability = self.player_starting_nuke_ability
     
   def print_status(self):
     ''' Prints the current status of the character '''
